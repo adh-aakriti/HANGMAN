@@ -36,7 +36,7 @@ static int connect_to_server(void) {
     return fd;
 }
 
-int main(void) {
+int main(int argc, char const *argv[]){
     const char *server_ip = "127.0.0.1";  // default for local testing
 
     if (argc >= 2) {
@@ -110,5 +110,6 @@ int main(void) {
 
     return 0;
 }
+
 
 
