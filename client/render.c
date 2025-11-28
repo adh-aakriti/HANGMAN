@@ -160,3 +160,62 @@ static void render_keyboard(SDL_Renderer *ren, TTF_Font *font) {
                 key_w, 
                 key_h
             };
+            SDL_SetRenderDrawColor(ren, key_color.r, key_color.g, key_color.b, key_color.a);
+            SDL_RenderFillRect(ren, &rect);
+            
+            char str[2] = {letter, '\0'};
+            render_text(ren, font, str, rect.x + 10, rect.y + 10, white);
+        }
+    }
+
+    pthread_mutex_unlock(&state.state_mutex);
+}
+
+
+void render_game(SDL_Renderer *renderer, TTF_Font *font) {
+
+    SDL_SetRenderDrawColor(renderer, 20, 20, 25, 255);
+    SDL_RenderClear(renderer);
+    
+    SDL_Color white = {255, 255, 255, 255};
+
+    pthread_mutex_lock(&state.state_mutex);
+
+    // 1. Top Line (Mistakes show /7)
+    char top_line[128];
+    snprintf(top_line, sizeof(top_line),
+             "Level: %d   Time: %d   Mistakes: %d/7", 
+             state.level, state.timer_val, state.mistakes);
+    render_text(renderer, font, top_line, 20, 20, white);
+
+    // 2. Word Length Message
+    char len_msg[64];
+    // Check for word_len > 0 to prevent "The word has 0 letters"
+    if (state.word_len > 0) {
+        snprintf(len_msg, sizeof(len_msg), "The word has %d letters", state.word_len);
+        render_centered_text(renderer, font, len_msg, 70, white);
+    } else {
+        // Fallback message if word_len isn't set yet
+        snprintf(len_msg, sizeof(len_msg), "Waiting for game start...");
+        render_centered_text(renderer, font, len_msg, 70, white);
+    }
+
+    // 3. Word Display (Centered and with spacing)
+    char word_display_buf[128];
+    // FIX: Ensure the format function is called with the current state data.
+    format_word_display(state.masked_word, state.word_len, word_display_buf);
+    render_centered_text(renderer, font, word_display_buf, 100, white); 
+
+    // 4. Status Message (Centered)
+    render_centered_text(renderer, font, state.status_msg, 160, white); 
+
+    // 5. Hangman Figure (uses mistakes count)
+    render_hangman(renderer, state.mistakes);
+    
+    pthread_mutex_unlock(&state.state_mutex);
+
+    // 6. Keyboard (calls its own lock internally)
+    render_keyboard(renderer, font); 
+    
+    SDL_RenderPresent(renderer);
+}
