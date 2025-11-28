@@ -5,6 +5,8 @@
 #include <pthread.h>
 #include "../common/protocol.h"
 
+int create_server_socket(int port);
+
 typedef struct {
     int socket_fd;
     struct sockaddr_in address;
@@ -33,3 +35,4 @@ void update_leaderboard(int client_id, const char* result);
 void broadcast(const char* message);
 
 #endif
+
