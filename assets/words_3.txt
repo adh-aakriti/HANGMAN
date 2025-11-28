@@ -1,0 +1,6 @@
+CPU
+RAM
+BUS
+BIT
+NET
+GUI
