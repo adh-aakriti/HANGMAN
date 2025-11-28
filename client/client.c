@@ -37,7 +37,7 @@ static int connect_to_server(void) {
 }
 
 int main(int argc, char const *argv[]){
- ## const char *server_ip = "127.0.0.1";
+    const char *server_ip = "127.0.0.1";
 
     if (argc >= 2) {
         server_ip = argv[1];
@@ -116,6 +116,7 @@ int main(int argc, char const *argv[]){
 
     return 0;
 }
+
 
 
 
