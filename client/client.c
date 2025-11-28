@@ -92,6 +92,13 @@ int main(int argc, char const *argv[]){
         Uint32 now = SDL_GetTicks();
         if (now - last_timer_tick > 1000) {
             last_timer_tick = now;
+            
+            pthread_mutex_lock(&state.state_mutex);
+            if (state.timer_val > 0) {
+                state.timer_val--;
+            }
+            pthread_mutex_unlock(&state.state_mutex);
+            
         }
 
         render_game(ren, font);
@@ -109,6 +116,7 @@ int main(int argc, char const *argv[]){
 
     return 0;
 }
+
 
 
 
