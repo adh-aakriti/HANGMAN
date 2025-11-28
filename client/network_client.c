@@ -57,7 +57,6 @@ void *network_listen_thread(void *arg) {
                 sscanf(line, "NEW_WORD %63s", state.masked_word);
                 state.mistakes = 0;
             
-            // --- FIX: Add New Message Handlers for Syncing State ---
             } else if (strncmp(line, "GUESSED", 7) == 0) {
                 sscanf(line, "GUESSED %26s", state.guessed_letters);
 
@@ -80,7 +79,6 @@ void *network_listen_thread(void *arg) {
                              "Game Over! The word was: %s", state.current_word);
                 }
                 state.game_over = 1;
-            // --- END FIX ---
 
             } else if (strncmp(line, "WINNER", 6) == 0) {
                 char name[32];
