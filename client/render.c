@@ -3,20 +3,34 @@ void draw_hangman(SDL_Renderer *ren, int mistakes) {
   SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
 
   // To Draw The Base
-  if (mistakes >= 0) { SDL_RenderDrawLine(ren, 50, 400, 250, 400); }
+  if (mistakes >= 0) {
+    SDL_RenderDrawLine(ren, 50, 400, 250, 400); 
+  }
   // To Draw The Pole
-  if (mistakes >= 1) { SDL_RenderDrawLine(ren, 150, 400, 150, 100); }
+  if (mistakes >= 1) { 
+    SDL_RenderDrawLine(ren, 150, 400, 150, 100); 
+  }
   // To Draw The Top
-  if (mistakes >= 2) { SDL_RenderDrawLine(ren, 150, 100, 300, 100); }
+  if (mistakes >= 2) { 
+    SDL_RenderDrawLine(ren, 150, 100, 300, 100); 
+  }
   // To Draw The Rope
-  if (mistakes >= 3) { SDL_RenderDrawLine(ren, 300, 100, 300, 150); }
+  if (mistakes >= 3) {
+    SDL_RenderDrawLine(ren, 300, 100, 300, 150); 
+  }
   // To Draw The Head
   if (mistakes >= 4) {
-      SDL_Rect r = {280, 150, 40, 40};
-      SDL_RenderDrawRect(ren, &r);
+      SDL_Rect head;
+      head.x = 280;
+      head.y = 150;
+      head.w = 40;
+      head.h = 40;
+      SDL_RenderDrawRect(ren, &head);
   }
   // To Draw The Body
-  if (mistakes >= 5) { SDL_RenderDrawLine (ren, 300, 190, 300, 300); }
+  if (mistakes >= 5) { 
+    SDL_RenderDrawLine (ren, 300, 190, 300, 300); 
+  }
   // To Draw The Arms/Legs 
   if (mistakes >= 6) {
       SDL_RenderDrawLine(ren, 300, 220, 270, 350);
@@ -61,5 +75,6 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
 
     SDL_RenderPresent(renderer);
 }
+
 
 
