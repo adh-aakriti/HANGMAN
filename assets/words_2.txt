@@ -1,5 +1,7 @@
-OS
-IO
-IP
-CD
-IT
+NO
+TO
+ON
+OR
+AT
+AN
+
