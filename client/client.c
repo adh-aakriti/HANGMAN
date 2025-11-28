@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <sys/time.h>
 
 GameState state;
 
@@ -15,6 +16,10 @@ static int connect_to_server(void) {
         perror("socket");
         return -1;
     }
+
+    struct timeval tv;
+    tv.tv_sec = 10;
+    tv.tv_usec = 0;
 
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
@@ -99,3 +104,4 @@ int main(void) {
 
     return 0;
 }
+
