@@ -16,7 +16,8 @@ int create_server_socket(int port) {
         die("setsockopt");
 
     address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
+    if (inet_pton(AF_INET, "127.0.0.1", &(address.sin_addr)) <= 0)
+        die("Invalid address/ Address not supported");
     address.sin_port = htons(port);
 
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
@@ -24,4 +25,5 @@ int create_server_socket(int port) {
 
     return server_fd;
 }
+
 
