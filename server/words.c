@@ -36,9 +36,12 @@ void init_words() {
     n2 = c2;
 }
 
-const char* pick_word(int len) {
-    if (len == 4 && n4 > 0) return w4[rand() % n4];
-    if (len == 3 && n3 > 0) return w3[rand() % n3];
-    if (len == 2 && n2 > 0) return w2[rand() % n2];
+char* get_random_word(int length) {
+    if (length == 4 && n4 > 0) return w4[rand() % n4];
+    if (length == 3 && n3 > 0) return w3[rand() % n3];
+    if (length == 2 && n2 > 0) return w2[rand() % n2];
     return "ok";
 }
+
+}
+
