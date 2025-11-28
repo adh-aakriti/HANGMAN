@@ -65,7 +65,6 @@ int main(int argc, char const *argv[]){
     SDL_Renderer *ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!ren) die("renderer failed");
 
-
     TTF_Font *font = TTF_OpenFont("assets/FreeSans.ttf", 24);
     if (!font) {
 
@@ -110,6 +109,7 @@ int main(int argc, char const *argv[]){
 
     return 0;
 }
+
 
 
 
