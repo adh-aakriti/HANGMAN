@@ -72,8 +72,8 @@ int main(int argc, char *argv[])
     pthread_create(&net_thread, NULL, network_listen_thread, NULL);
 
     //Main Loop
-    SDL_Event event;
-    Uint32 last_tick = SDL_GetTicks();
+    SDL_Event e;
+    Uint32 last_timer_tick = SDL_GetTicks();
 
     while (state.running) 
     {
@@ -83,9 +83,9 @@ int main(int argc, char *argv[])
             {
                 state.running = 0;
             }
-            else if (event.type == SDL_KEYDOWN) 
+            else if (e.type == SDL_KEYDOWN) 
             {
-                char key = event.key.keysym.sym;
+                char key = e.key.keysym.sym;
                 if (k >= 'a' && k <= 'z') 
                 {
                     send_guess(k);
@@ -116,4 +116,5 @@ int main(int argc, char *argv[])
     cleanup_sdl(win, ren);
     return 0;
 }
+
 
