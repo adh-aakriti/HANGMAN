@@ -54,8 +54,21 @@ void *network_listen_thread(void *arg) {
             } else if (strncmp(line, "NEW_WORD", 8) == 0) {
                 sscanf(line, "NEW_WORD %63s", state.masked_word);
                 state.mistakes = 0;
-
-            } else if (strncmp(line, "WINNER", 6) == 0) {
+                
+            } 
+            // --- NEW: Handle the list of guessed letters for keyboard overlay ---
+            else if (strncmp(line, "GUESSED", 7) == 0) {
+                // The sscanf copies the string of guessed letters into state.guessed_letters
+                sscanf(line, "GUESSED %26s", state.guessed_letters);
+            }
+            // --- NEW: Handle message when attempting to reguess a letter ---
+            else if (strncmp(line, "ALREADY_GUESSED", 15) == 0) {
+                char letter;
+                sscanf(line, "ALREADY_GUESSED %c", &letter);
+                snprintf(state.status_msg, sizeof(state.status_msg), "Letter '%c' already guessed.", letter);
+            }
+            // ------------------------------------------------------------------
+            else if (strncmp(line, "WINNER", 6) == 0) {
                 char name[32];
                 sscanf(line, "WINNER %31s", name);
                 snprintf(state.status_msg, sizeof(state.status_msg),
