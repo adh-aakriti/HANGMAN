@@ -7,7 +7,7 @@
 // Global state variable (declared in client.h)
 extern GameState state;
 
-// NOTE: This function MUST be non-static because the prototype is in client.h
+// NOTE: This function MUST be non-static (no 'static' keyword) because the prototype is in client.h
 void render_text(SDL_Renderer *ren, TTF_Font *font,
                  const char *txt, int x, int y, SDL_Color color) {
     if (!font || !txt) return;
@@ -59,9 +59,9 @@ static void render_hangman(SDL_Renderer *ren, int mistakes) {
     
     SDL_SetRenderDrawColor(ren, 255, 255, 255, 255); // White color
 
-    // --- Gallows Structure (Mistake >= 1 draws the whole structure) ---
+    // --- Gallows Structure (Always drawn) ---
 
-    // 1. Base / Platform (always drawn, or part of MISTAKE 1)
+    // 1. Base / Platform
     SDL_RenderDrawLine(ren, gallows_x - 50, gallows_y, gallows_x + 50, gallows_y); 
     
     // 2. Vertical Post
@@ -77,9 +77,9 @@ static void render_hangman(SDL_Renderer *ren, int mistakes) {
     SDL_RenderDrawLine(ren, rope_x, rope_top_y, rope_x, head_center_y - head_radius);
 
     // --- Body Parts (7 mistakes) ---
-    // Order: Head, Body, Arm1, Arm2, Leg1, Leg2, Dead Face
+    // Order: Head (M1), Body (M2), Arm1 (M3), Arm2 (M4), Leg1 (M5), Leg2 (M6), Dead Face (M7)
 
-    // MISTAKE 1: Head (uses MISTAKE 1 in the new list)
+    // MISTAKE 1: Head 
     if (mistakes >= 1) {
         // Draw the Head (Simplified square approximation)
         SDL_Rect head = {rope_x - head_radius, head_center_y - head_radius, head_radius * 2, head_radius * 2};
@@ -128,7 +128,7 @@ static void render_hangman(SDL_Renderer *ren, int mistakes) {
 
 // Renders the QWERTY keyboard overlay
 static void render_keyboard(SDL_Renderer *ren, TTF_Font *font) {
-    // Keyboard positioned low-center to avoid conflicts
+    // Keyboard positioned low-center
     int start_x = 100; 
     int start_y = 450;
     int key_w = 40;
@@ -200,20 +200,20 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
     // 1. Top Line (Mistakes now show /7)
     char top_line[128];
     snprintf(top_line, sizeof(top_line),
-             "Level: %d   Time: %d   Mistakes: %d/7", // FIX: Added /7
+             "Level: %d   Time: %d   Mistakes: %d/7", 
              state.level, state.timer_val, state.mistakes);
     render_text(renderer, font, top_line, 20, 20, white);
 
     // 2. Word Display (Centered and with spacing)
     char word_display_buf[128];
-    // FIX: Ensure word_len is available (requires client.h and network_client.c updates)
     format_word_display(state.masked_word, state.word_len, word_display_buf);
-    render_centered_text(renderer, font, word_display_buf, 100, white); // FIX: Positioned higher
+    render_centered_text(renderer, font, word_display_buf, 100, white); 
 
     // 3. Status Message (Centered)
-    render_centered_text(renderer, font, state.status_msg, 160, white); // FIX: Positioned higher
+    render_centered_text(renderer, font, state.status_msg, 160, white); 
 
     // 4. Hangman Figure (uses mistakes count)
+    // Gallows is always drawn, mistakes adds body parts
     render_hangman(renderer, state.mistakes);
     
     pthread_mutex_unlock(&state.state_mutex);
