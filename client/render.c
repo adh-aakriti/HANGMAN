@@ -197,29 +197,35 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
 
     pthread_mutex_lock(&state.state_mutex);
 
-    // 1. Top Line (Mistakes now show /7)
+    // 1. Top Line (Mistakes show /7)
     char top_line[128];
     snprintf(top_line, sizeof(top_line),
              "Level: %d   Time: %d   Mistakes: %d/7", 
              state.level, state.timer_val, state.mistakes);
     render_text(renderer, font, top_line, 20, 20, white);
 
-    // 2. Word Display (Centered and with spacing)
-    char word_display_buf[128];
-    format_word_display(state.masked_word, state.word_len, word_display_buf);
-    render_centered_text(renderer, font, word_display_buf, 100, white); 
+    // 2. Word Length Message (New Feature)
+    char len_msg[64];
+    snprintf(len_msg, sizeof(len_msg), "The word has %d letters", state.word_len);
+    render_centered_text(renderer, font, len_msg, 70, white); // Positioned high
 
-    // 3. Status Message (Centered)
+    // 3. Word Display (Centered and with spacing)
+    char word_display_buf[128];
+    // This is the line that shows the blank spaces/guessed letters
+    format_word_display(state.masked_word, state.word_len, word_display_buf);
+    render_centered_text(renderer, font, word_display_buf, 100, white); // Positioned slightly below word length
+
+    // 4. Status Message (Centered)
     render_centered_text(renderer, font, state.status_msg, 160, white); 
 
-    // 4. Hangman Figure (uses mistakes count)
-    // Gallows is always drawn, mistakes adds body parts
+    // 5. Hangman Figure (uses mistakes count)
     render_hangman(renderer, state.mistakes);
     
     pthread_mutex_unlock(&state.state_mutex);
 
-    // 5. Keyboard (calls its own lock internally)
+    // 6. Keyboard (calls its own lock internally)
     render_keyboard(renderer, font); 
     
     SDL_RenderPresent(renderer);
 }
+
