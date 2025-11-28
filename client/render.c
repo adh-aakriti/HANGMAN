@@ -7,7 +7,7 @@
 // Global state variable (declared in client.h)
 extern GameState state;
 
-// NOTE: Renamed to render_text to match client.h
+// NOTE: This function MUST be non-static because the prototype is in client.h
 void render_text(SDL_Renderer *ren, TTF_Font *font,
                  const char *txt, int x, int y, SDL_Color color) {
     if (!font || !txt) return;
@@ -35,20 +35,23 @@ static void render_centered_text(SDL_Renderer *ren, TTF_Font *font,
     render_text(ren, font, txt, (800 - w) / 2, y, color);
 }
 
-// Function to space out the letters for clarity (displays dashes and letters)
+// FIX: This helper formats the word string with spaces between letters/dashes
 static char* format_word_display(const char *masked_word, int len, char *buffer) {
     buffer[0] = '\0';
+    // Use the length passed from the state
     for (int i = 0; i < len; i++) {
+        // Append the letter/blank followed by a space
         char temp[3] = {masked_word[i], ' ', '\0'};
         strcat(buffer, temp);
     }
+    // Remove the trailing space if the word is not empty
     if (len > 0) {
         buffer[strlen(buffer) - 1] = '\0';
     }
     return buffer;
 }
 
-// Renders the Hangman Figure based on mistake count
+// Renders the Hangman Figure based on mistake count (Max 7 mistakes for body parts)
 static void render_hangman(SDL_Renderer *ren, int mistakes) {
     int gallows_x = 100;
     int gallows_y = 400; 
@@ -56,7 +59,7 @@ static void render_hangman(SDL_Renderer *ren, int mistakes) {
     int head_radius = 15;
     int body_length = 40;
     
-    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255); 
+    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255); // White color
 
     // --- Gallows Structure (Always drawn) ---
     SDL_RenderDrawLine(ren, gallows_x - 50, gallows_y, gallows_x + 50, gallows_y); 
@@ -92,10 +95,8 @@ static void render_hangman(SDL_Renderer *ren, int mistakes) {
     }
     if (mistakes >= 7) { // Dead Face
         int eye_offset = head_radius / 3;
-        // Left Eye (X)
         SDL_RenderDrawLine(ren, rope_x - eye_offset, head_center_y - eye_offset, rope_x - head_radius + eye_offset, head_center_y + eye_offset);
         SDL_RenderDrawLine(ren, rope_x - eye_offset, head_center_y + eye_offset, rope_x - head_radius + eye_offset, head_center_y - eye_offset);
-        // Right Eye (X)
         SDL_RenderDrawLine(ren, rope_x + head_radius - eye_offset, head_center_y - eye_offset, rope_x + eye_offset, head_center_y + eye_offset);
         SDL_RenderDrawLine(ren, rope_x + head_radius - eye_offset, head_center_y + eye_offset, rope_x + eye_offset, head_center_y - eye_offset);
     }
@@ -126,6 +127,7 @@ static void render_keyboard(SDL_Renderer *ren, TTF_Font *font) {
             char letter = rows[r][i];
             SDL_Color key_color = unguessed_gray; 
             
+            // NOTE: state.guessed_letters and state.word_len are required in client.h
             if (strchr(state.guessed_letters, letter)) {
                 if (strchr(state.masked_word, letter)) {
                     key_color = correct_green;
@@ -161,7 +163,7 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
 
     pthread_mutex_lock(&state.state_mutex);
 
-    // 1. Top Line (Mistakes show /7)
+    // 1. Top Line (Level, Time, Mistakes)
     char top_line[128];
     snprintf(top_line, sizeof(top_line),
              "Level: %d   Time: %d   Mistakes: %d/7", 
@@ -174,13 +176,13 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
         snprintf(len_msg, sizeof(len_msg), "The word has %d letters", state.word_len);
         render_centered_text(renderer, font, len_msg, 70, white);
     } else {
-        // This is the message you are currently seeing
         snprintf(len_msg, sizeof(len_msg), "Waiting for game start...");
         render_centered_text(renderer, font, len_msg, 70, white);
     }
 
     // 3. Word Display (Dashes and Guessed Letters - Position: Y=110)
     char word_display_buf[128];
+    // FIX: This calls the helper function to format the word with spaces
     format_word_display(state.masked_word, state.word_len, word_display_buf);
     render_centered_text(renderer, font, word_display_buf, 110, white); 
 
@@ -192,7 +194,7 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
     
     pthread_mutex_unlock(&state.state_mutex);
 
-    // 6. Keyboard (calls its own lock internally)
+    // 6. Keyboard 
     render_keyboard(renderer, font); 
     
     SDL_RenderPresent(renderer);
