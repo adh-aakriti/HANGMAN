@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
-static void render_text(SDL_Renderer *ren, TTF_Font *font,
-                      const char *txt, int x, int y, SDL_Color color) {
+void render_text(SDL_Renderer *ren, TTF_Font *font,
+                 const char *txt, int x, int y, SDL_Color color) {
     if (!font || !txt) return;
 
     SDL_Surface *surf = TTF_RenderText_Solid(font, txt, color);
@@ -66,3 +66,4 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
 
     SDL_RenderPresent(renderer);
 }
+
