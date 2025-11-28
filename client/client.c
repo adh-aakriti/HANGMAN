@@ -83,8 +83,10 @@ int main(int argc, char const *argv[]){
                 SDL_Keycode key = ev.key.keysym.sym;
 
                 if (key >= SDLK_a && key <= SDLK_z) {
-                    char letter = (char)('a' + (key - SDLK_a));
+                    char letter = (char)('A' + (key - SDLK_a)); 
                     send_guess(letter);
+                }
+            }
                 }
             }
         }
@@ -116,6 +118,7 @@ int main(int argc, char const *argv[]){
 
     return 0;
 }
+
 
 
 
