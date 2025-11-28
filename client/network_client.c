@@ -54,18 +54,21 @@ void *network_listen_thread(void *arg) {
             } else if (strncmp(line, "NEW_WORD", 8) == 0) {
                 sscanf(line, "NEW_WORD %63s", state.masked_word);
                 state.mistakes = 0;
-                
-            } 
-            // --- NEW: Handle the list of guessed letters for keyboard overlay ---
-            else if (strncmp(line, "GUESSED", 7) == 0) {
-                // The sscanf copies the string of guessed letters into state.guessed_letters
+
+            } else if (strncmp(line, "GUESSED", 7) == 0) {
                 sscanf(line, "GUESSED %26s", state.guessed_letters);
-            }
-            // --- NEW: Handle message when attempting to reguess a letter ---
-            else if (strncmp(line, "ALREADY_GUESSED", 15) == 0) {
+                
+            } else if (strncmp(line, "ALREADY_GUESSED", 15) == 0) {
                 char letter;
                 sscanf(line, "ALREADY_GUESSED %c", &letter);
                 snprintf(state.status_msg, sizeof(state.status_msg), "Letter '%c' already guessed.", letter);
+                
+            } else if (strncmp(line, "WORD_LEN", 8) == 0) { 
+                sscanf(line, "WORD_LEN %d", &state.word_len);
+
+            } else if (strncmp(line, "GAME_OVER", 9) == 0) {
+                snprintf(state.status_msg, sizeof(state.status_msg), "Game Over! The word was: %s", state.current_word);
+                state.game_over = 1;
             }
             // ------------------------------------------------------------------
             else if (strncmp(line, "WINNER", 6) == 0) {
@@ -84,3 +87,4 @@ void *network_listen_thread(void *arg) {
 
     return NULL;
 }
+
