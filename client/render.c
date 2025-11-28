@@ -7,7 +7,7 @@
 // Global state variable (declared in client.h)
 extern GameState state;
 
-// NOTE: This function MUST be non-static (no 'static' keyword) because the prototype is in client.h
+// NOTE: This function MUST be non-static because the prototype is in client.h
 void render_text(SDL_Renderer *ren, TTF_Font *font,
                  const char *txt, int x, int y, SDL_Color color) {
     if (!font || !txt) return;
@@ -27,7 +27,7 @@ void render_text(SDL_Renderer *ren, TTF_Font *font,
     SDL_DestroyTexture(tex);
 }
 
-// Renders text centered on the screen (assumes 800 width)
+// Renders text centered on the screen (assuming 800 width)
 static void render_centered_text(SDL_Renderer *ren, TTF_Font *font,
                                  const char *txt, int y, SDL_Color color) {
     int w, h;
@@ -46,59 +46,83 @@ static char* format_word_display(const char *masked_word, int len, char *buffer)
     return buffer;
 }
 
-// Renders the Hangman Figure based on mistake count (Max 7 mistakes)
+// Renders the Hangman Figure based on mistake count (Max 7 mistakes for body parts)
 static void render_hangman(SDL_Renderer *ren, int mistakes) {
     // Hangman gallows positioning (Left side of the screen)
     int gallows_x = 100;
-    int gallows_y = 400;
+    int gallows_y = 400; // Base line
+    int post_height = 200;
+    int head_radius = 15;
+    int body_length = 40;
+    int arm_length = 20;
+    int leg_length = 25;
     
     SDL_SetRenderDrawColor(ren, 255, 255, 255, 255); // White color
 
-    // 1. Base (mistakes >= 1)
-    if (mistakes >= 1) {
-        SDL_RenderDrawLine(ren, gallows_x - 50, gallows_y, gallows_x + 50, gallows_y); 
-    }
+    // --- Gallows Structure (Mistake >= 1 draws the whole structure) ---
 
-    // 2. Vertical Post (mistakes >= 2)
-    if (mistakes >= 2) {
-        SDL_RenderDrawLine(ren, gallows_x, gallows_y, gallows_x, gallows_y - 200); 
-    }
-
-    // 3. Top Beam (mistakes >= 3)
-    if (mistakes >= 3) {
-        SDL_RenderDrawLine(ren, gallows_x, gallows_y - 200, gallows_x + 70, gallows_y - 200); 
-    }
+    // 1. Base / Platform (always drawn, or part of MISTAKE 1)
+    SDL_RenderDrawLine(ren, gallows_x - 50, gallows_y, gallows_x + 50, gallows_y); 
     
-    // 4. Rope/Head Attachment (mistakes >= 4)
+    // 2. Vertical Post
+    SDL_RenderDrawLine(ren, gallows_x, gallows_y, gallows_x, gallows_y - post_height); 
+    
+    // 3. Top Beam
+    SDL_RenderDrawLine(ren, gallows_x, gallows_y - post_height, gallows_x + 70, gallows_y - post_height); 
+    
+    // 4. Rope / Noose
     int rope_x = gallows_x + 70;
-    int rope_top_y = gallows_y - 200;
-    int head_top_y = rope_top_y + 20; // 20px rope length
-    if (mistakes >= 4) {
-        SDL_RenderDrawLine(ren, rope_x, rope_top_y, rope_x, head_top_y); // Rope
-    }
-    
-    // Body Parts (start drawing from mistake 4 to mistake 10)
-    int head_size = 20;
-    int body_top_y = head_top_y + head_size;
-    
-    // 5. Head (mistakes >= 5)
-    if (mistakes >= 5) {
-        // Simplified square approximation for head
-        SDL_Rect head = {rope_x - head_size / 2, head_top_y, head_size, head_size};
+    int rope_top_y = gallows_y - post_height;
+    int head_center_y = rope_top_y + head_radius * 2;
+    SDL_RenderDrawLine(ren, rope_x, rope_top_y, rope_x, head_center_y - head_radius);
+
+    // --- Body Parts (7 mistakes) ---
+    // Order: Head, Body, Arm1, Arm2, Leg1, Leg2, Dead Face
+
+    // MISTAKE 1: Head (uses MISTAKE 1 in the new list)
+    if (mistakes >= 1) {
+        // Draw the Head (Simplified square approximation)
+        SDL_Rect head = {rope_x - head_radius, head_center_y - head_radius, head_radius * 2, head_radius * 2};
         SDL_RenderDrawRect(ren, &head);
     }
     
-    // 6. Body (mistakes >= 6)
-    if (mistakes >= 6) {
-        SDL_RenderDrawLine(ren, rope_x, body_top_y, rope_x, body_top_y + 40); // Body length 40
+    // MISTAKE 2: Body
+    int body_top_y = head_center_y + head_radius;
+    int body_bottom_y = body_top_y + body_length;
+    if (mistakes >= 2) {
+        SDL_RenderDrawLine(ren, rope_x, body_top_y, rope_x, body_bottom_y);
     }
     
-    // 7. Left Arm (mistakes >= 7) -> This is the final mistake before game over (assuming 7 mistake limit)
-    int shoulder_y = body_top_y + 10;
+    // MISTAKE 3: Left Arm
+    int shoulder_y = body_top_y + 5;
+    if (mistakes >= 3) {
+        SDL_RenderDrawLine(ren, rope_x, shoulder_y, rope_x - arm_length, shoulder_y + arm_length);
+    }
+    
+    // MISTAKE 4: Right Arm
+    if (mistakes >= 4) {
+        SDL_RenderDrawLine(ren, rope_x, shoulder_y, rope_x + arm_length, shoulder_y + arm_length);
+    }
+    
+    // MISTAKE 5: Left Leg
+    if (mistakes >= 5) {
+        SDL_RenderDrawLine(ren, rope_x, body_bottom_y, rope_x - leg_length, body_bottom_y + leg_length);
+    }
+    
+    // MISTAKE 6: Right Leg
+    if (mistakes >= 6) {
+        SDL_RenderDrawLine(ren, rope_x, body_bottom_y, rope_x + leg_length, body_bottom_y + leg_length);
+    }
+    
+    // MISTAKE 7 (Final Mistake): Dead Face (X eyes)
     if (mistakes >= 7) {
-        SDL_RenderDrawLine(ren, rope_x, shoulder_y, rope_x - 15, shoulder_y + 15); // Left Arm
-        // Note: We stop here because the server logic sets game_over at 7 mistakes.
-        // If we allowed more, we'd add legs next.
+        int eye_offset = head_radius / 3;
+        // Left Eye (X)
+        SDL_RenderDrawLine(ren, rope_x - eye_offset, head_center_y - eye_offset, rope_x - head_radius + eye_offset, head_center_y + eye_offset);
+        SDL_RenderDrawLine(ren, rope_x - eye_offset, head_center_y + eye_offset, rope_x - head_radius + eye_offset, head_center_y - eye_offset);
+        // Right Eye (X)
+        SDL_RenderDrawLine(ren, rope_x + head_radius - eye_offset, head_center_y - eye_offset, rope_x + eye_offset, head_center_y + eye_offset);
+        SDL_RenderDrawLine(ren, rope_x + head_radius - eye_offset, head_center_y + eye_offset, rope_x + eye_offset, head_center_y - eye_offset);
     }
 }
 
@@ -173,20 +197,21 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
 
     pthread_mutex_lock(&state.state_mutex);
 
-    // 1. Top Line (Still left-aligned for data)
+    // 1. Top Line (Mistakes now show /7)
     char top_line[128];
     snprintf(top_line, sizeof(top_line),
-             "Level: %d   Time: %d   Mistakes: %d",
+             "Level: %d   Time: %d   Mistakes: %d/7", // FIX: Added /7
              state.level, state.timer_val, state.mistakes);
     render_text(renderer, font, top_line, 20, 20, white);
 
     // 2. Word Display (Centered and with spacing)
     char word_display_buf[128];
+    // FIX: Ensure word_len is available (requires client.h and network_client.c updates)
     format_word_display(state.masked_word, state.word_len, word_display_buf);
-    render_centered_text(renderer, font, word_display_buf, 100, white); 
+    render_centered_text(renderer, font, word_display_buf, 100, white); // FIX: Positioned higher
 
     // 3. Status Message (Centered)
-    render_centered_text(renderer, font, state.status_msg, 160, white); 
+    render_centered_text(renderer, font, state.status_msg, 160, white); // FIX: Positioned higher
 
     // 4. Hangman Figure (uses mistakes count)
     render_hangman(renderer, state.mistakes);
