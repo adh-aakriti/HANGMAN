@@ -1,8 +1,8 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include <SDL.h>
+#include <SDL_ttf.h>
 #include <pthread.h>
 #include "../common/protocol.h"
 
@@ -35,5 +35,6 @@ void *network_listen_thread(void *arg);
 void send_guess(char letter);
 
 #endif
+
 
 
