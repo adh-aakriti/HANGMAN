@@ -5,8 +5,8 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_FLAGS "-Wall -Wextra -pthread")
 
 find_package(SDL2 REQUIRED)
-find_path(TTF_INC SDL_ttf.h PATH_SUFFIXES SDL2)
-find_library(TTF_LIB SDL2_ttf)
+set(TTF_INC /opt/homebrew/include/SDL2)
+set(TTF_LIB /opt/homebrew/lib/libSDL2_ttf.dylib)
 
 include_directories(
     common
@@ -14,7 +14,6 @@ include_directories(
     client
     ${SDL2_INCLUDE_DIRS}
     ${TTF_INC}
-    /opt/homebrew/include/SDL2
 )
 
 add_executable(server_app
@@ -35,4 +34,5 @@ add_executable(client_app
     common/utils.c
 )
 target_link_libraries(client_app ${SDL2_LIBRARIES} ${TTF_LIB} pthread)
+
 
