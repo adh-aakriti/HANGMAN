@@ -188,25 +188,22 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
              state.level, state.timer_val, state.mistakes);
     render_text(renderer, font, top_line, 20, 20, white);
 
-    // 2. Word Length Message
+    // 2. Word Length Message (Position: Y=70)
     char len_msg[64];
-    // Check for word_len > 0 to prevent "The word has 0 letters"
     if (state.word_len > 0) {
         snprintf(len_msg, sizeof(len_msg), "The word has %d letters", state.word_len);
         render_centered_text(renderer, font, len_msg, 70, white);
     } else {
-        // Fallback message if word_len isn't set yet
         snprintf(len_msg, sizeof(len_msg), "Waiting for game start...");
         render_centered_text(renderer, font, len_msg, 70, white);
     }
 
-    // 3. Word Display (Centered and with spacing)
+    // 3. Word Display (Centered and with spacing - Position: Y=110)
     char word_display_buf[128];
-    // FIX: Ensure the format function is called with the current state data.
     format_word_display(state.masked_word, state.word_len, word_display_buf);
-    render_centered_text(renderer, font, word_display_buf, 100, white); 
+    render_centered_text(renderer, font, word_display_buf, 110, white); 
 
-    // 4. Status Message (Centered)
+    // 4. Status Message (Centered - Position: Y=160)
     render_centered_text(renderer, font, state.status_msg, 160, white); 
 
     // 5. Hangman Figure (uses mistakes count)
