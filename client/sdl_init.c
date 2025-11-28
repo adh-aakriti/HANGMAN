@@ -26,3 +26,4 @@ void cleanup_sdl(SDL_Window* win, SDL_Renderer* ren) {
     TTF_Quit();
     SDL_Quit();
 }
+
