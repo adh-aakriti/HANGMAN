@@ -41,7 +41,7 @@ char* get_random_word(int length) {
     if (length == 3 && n3 > 0) return w3[rand() % n3];
     if (length == 2 && n2 > 0) return w2[rand() % n2];
     return "ok";
-}
 
 }
+
 
