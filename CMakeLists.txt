@@ -4,28 +4,33 @@ project(HangmanRace)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_FLAGS "-Wall -Wextra -pthread")
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+
+include_directories(/opt/homebrew/include/SDL2)
+link_directories(/opt/homebrew/lib)
+
 find_package(SDL2 REQUIRED)
-set(TTF_INC /opt/homebrew/include/SDL2)
-set(TTF_LIB /opt/homebrew/lib/libSDL2_ttf.dylib)
+
+set(SDL2_LIBRARIES SDL2)
+set(SDL2_TTF_LIBRARY SDL2_ttf)
 
 include_directories(
-    common
-    server
-    client
-    ${SDL2_INCLUDE_DIRS}
-    ${TTF_INC}
+    ${PROJECT_SOURCE_DIR}/common
+    ${PROJECT_SOURCE_DIR}/server
+    ${PROJECT_SOURCE_DIR}/client
 )
 
-add_executable(server_app
+add_executable(hangman_server
     server/server.c
     server/network.c
     server/words.c
     server/leaderboard.c
+    server/timer.c 
     common/utils.c
 )
-target_link_libraries(server_app pthread)
+target_link_libraries(hangman_server pthread)
 
-add_executable(client_app
+add_executable(hangman_client
     client/client.c
     client/render.c
     client/gui.c
@@ -33,6 +38,5 @@ add_executable(client_app
     client/sdl_init.c
     common/utils.c
 )
-target_link_libraries(client_app ${SDL2_LIBRARIES} ${TTF_LIB} pthread)
 
-
+target_link_libraries(hangman_client SDL2 SDL2_ttf pthread)
