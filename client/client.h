@@ -20,6 +20,7 @@ typedef struct {
     int game_over;
     char guessed_letters[27];
     int word_len;
+    char current_word[64];
 
     pthread_mutex_t state_mutex;
 } GameState;
@@ -39,6 +40,7 @@ void *network_listen_thread(void *arg);
 void send_guess(char letter);
 
 #endif
+
 
 
 
