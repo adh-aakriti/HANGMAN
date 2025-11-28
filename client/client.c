@@ -36,13 +36,19 @@ static int connect_to_server(void) {
     return fd;
 }
 
-int main(void) {
+int main(int argc, char const *argv[]){
+    const char *server_ip = "127.0.0.1";
+
+    if (argc >= 2) {
+        server_ip = argv[1];
+    }
+
     memset(&state, 0, sizeof(state));
     pthread_mutex_init(&state.state_mutex, NULL);
 
     state.socket_fd = connect_to_server();
     if (state.socket_fd < 0) {
-        fprintf(stderr, "Failed to connect to server. Ensure server is running.\n");
+        fprintf(stderr, "could not connect to server\n");
         return 1;
     }
 
@@ -61,12 +67,12 @@ int main(void) {
 
     TTF_Font *font = TTF_OpenFont("assets/FreeSans.ttf", 24);
     if (!font) {
-        fprintf(stderr, "Could not open font: %s\n", TTF_GetError());
+
+        fprintf(stderr, "could not open font: %s\n", TTF_GetError());
     }
 
     SDL_Event ev;
-    Uint32 last_timer_tick = SDL_GetTicks(); 
-    Uint32 now;
+    Uint32 last_timer_tick = SDL_GetTicks();
 
     while (state.running && !state.game_over) {
 
@@ -77,14 +83,15 @@ int main(void) {
                 SDL_Keycode key = ev.key.keysym.sym;
 
                 if (key >= SDLK_a && key <= SDLK_z) {
-                    char letter = (char)('A' + (key - SDLK_a)); 
+                    char letter = (char)('a' + (key - SDLK_a));
                     send_guess(letter);
                 }
             }
         }
 
-        now = SDL_GetTicks();
+        Uint32 now = SDL_GetTicks();
         if (now - last_timer_tick > 1000) {
+            last_timer_tick = now;
             
             pthread_mutex_lock(&state.state_mutex);
             if (state.timer_val > 0) {
@@ -92,24 +99,20 @@ int main(void) {
             }
             pthread_mutex_unlock(&state.state_mutex);
             
-            last_timer_tick = now;
         }
 
         render_game(ren, font);
-        
         SDL_Delay(16);
-    } 
-
-    state.running = 0; 
-    
-    pthread_join(net_thread, NULL); 
-
-    if (state.socket_fd >= 0) {
-        close(state.socket_fd);
     }
+
+    state.running = 0;
+    pthread_join(net_thread, NULL);
+
+    close(state.socket_fd);
 
     if (font) TTF_CloseFont(font);
     cleanup_sdl(win, ren);
+    pthread_mutex_destroy(&state.state_mutex);
 
     return 0;
 }
