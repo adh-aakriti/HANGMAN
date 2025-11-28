@@ -53,7 +53,7 @@ void check_timeout(Client *cli) {
         snprintf(buf, sizeof(buf), "NEW_WORD %s\n", cli->masked_word);
         send_msg(cli, buf);
         
-        // NEW: Send Word Length
+        // FIX: Send Word Length
         snprintf(buf, sizeof(buf), "WORD_LEN %d\n", cli->word_len);
         send_msg(cli, buf);
 
@@ -97,10 +97,10 @@ void process_guess(Client *cli, char letter) {
         cli->mistakes++;
     }
 
-    // NEW: Check for Loss condition (7 incorrect guesses)
+    // FIX: Check for Loss condition (7 incorrect guesses)
     if (cli->mistakes >= 7) {
         // Send the final masked word and the actual word
-        snprintf(buf, sizeof(buf), "UPDATE %s %d\n", cli->masked_word, cli->mistakes);
+        snprintf(buf, sizeof(buf), "UPDATE %s %d\n", cli->current_word, cli->mistakes);
         send_msg(cli, buf);
         
         // Send actual word to client for display
@@ -111,7 +111,7 @@ void process_guess(Client *cli, char letter) {
         snprintf(buf, sizeof(buf), "GAME_OVER LOSE\n");
         send_msg(cli, buf);
         cli->active = 0; 
-        // update_leaderboard(cli->id, "LOST"); 
+        update_leaderboard(cli->id, "LOST"); 
         return;
     }
 
@@ -133,7 +133,7 @@ void process_guess(Client *cli, char letter) {
             }
             pthread_mutex_unlock(&clients_mutex);
 
-            // update_leaderboard(cli->id, "WON");
+            update_leaderboard(cli->id, "WON");
             return;
         }
 
@@ -148,7 +148,7 @@ void process_guess(Client *cli, char letter) {
         snprintf(buf, sizeof(buf), "WORD %s\n", cli->masked_word);
         send_msg(cli, buf);
         
-        // NEW: Send Word Length
+        // FIX: Send Word Length
         snprintf(buf, sizeof(buf), "WORD_LEN %d\n", cli->word_len);
         send_msg(cli, buf);
 
@@ -176,6 +176,8 @@ void *client_handler(void *arg) {
     setup_level(cli);
 
     char msg[BUFFER_SIZE];
+    
+    // FIX: Add WORD_LEN to initial message
     snprintf(msg, sizeof(msg),
              "GAME_START\nLEVEL %d\nWORD %s\nWORD_LEN %d\nTIMER %d\n", 
              cli->level, cli->masked_word, cli->word_len, cli->time_limit);
@@ -228,7 +230,7 @@ void *client_handler(void *arg) {
 }
 
 int main() {
-    // init_words(); 
+    init_words(); 
 
     int server_fd = create_server_socket(PORT);
     printf("Server started on port %d\n", PORT);
