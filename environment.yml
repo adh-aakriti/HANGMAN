@@ -1,0 +1,14 @@
+name: hangman
+channels:
+  - conda-forge
+  - nodefaults
+
+dependencies:
+  - python=3.*         
+  - cmake
+  - make
+  - c-compiler
+  - cxx-compiler
+  - pkg-config
+  - sdl2
+  - sdl2_ttf
