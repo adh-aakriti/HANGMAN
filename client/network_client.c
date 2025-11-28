@@ -33,7 +33,7 @@ void *network_listen_thread(void *arg) {
     buf[n] = '\0';
     pthread_mutex_lock(&state.state_mutex);
 
-    char *ln = strtok(buf, "\n")
+    char *ln = strtok(buf, "\n");
     while (ln) {
       if (strncmp(ln, "LEVEL", 5) == 0)
         sscanf(ln, "LEVEL %d", &state.level);
@@ -68,6 +68,7 @@ void *network_listen_thread(void *arg) {
 
   return NULL;
 }   
+
 
 
 
