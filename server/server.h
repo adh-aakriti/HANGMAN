@@ -20,6 +20,7 @@ typedef struct {
     int mistakes;
     time_t start_time;
     int time_limit;
+    char guessed_letters[27];
     int finished;
 } Client;
 
@@ -35,4 +36,5 @@ void update_leaderboard(int client_id, const char* result);
 void broadcast(const char* message);
 
 #endif
+
 
