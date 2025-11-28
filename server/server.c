@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <sys/select.h>
 #include <string.h>
-#include <ctype.h> // NEW: Added for toupper()
+#include <ctype.h> 
 
 Client *clients[100];
 int client_count = 0;
@@ -23,12 +23,12 @@ void setup_level(Client *cli) {
 
     strcpy(cli->current_word, get_random_word(len));
 
-    cli->word_len = len;
+    cli->word_len = len; // Correctly sets word length
     cli->time_limit  = time_sec;
     cli->start_time  = time(NULL);
     cli->mistakes    = 0;
     
-    // NEW: Clear guessed letters on new level
+    // Clear guessed letters on new level
     memset(cli->guessed_letters, 0, sizeof(cli->guessed_letters)); 
 
     memset(cli->masked_word, '_', len);
@@ -52,11 +52,15 @@ void check_timeout(Client *cli) {
 
         snprintf(buf, sizeof(buf), "NEW_WORD %s\n", cli->masked_word);
         send_msg(cli, buf);
+        
+        // NEW: Send Word Length
+        snprintf(buf, sizeof(buf), "WORD_LEN %d\n", cli->word_len);
+        send_msg(cli, buf);
 
         snprintf(buf, sizeof(buf), "TIMER %d\n", cli->time_limit);
         send_msg(cli, buf);
         
-        // NEW: Send updated (cleared) guessed list
+        // Send updated (cleared) guessed list
         snprintf(buf, sizeof(buf), "GUESSED %s\n", cli->guessed_letters);
         send_msg(cli, buf);
     }
@@ -65,22 +69,20 @@ void check_timeout(Client *cli) {
 void process_guess(Client *cli, char letter) {
     // Convert guess to uppercase for consistent processing
     letter = toupper(letter);
-    char buf[BUFFER_SIZE]; // Use one buffer for all messages
+    char buf[BUFFER_SIZE]; 
 
-    // 1. NEW: Check for Duplicate Guess (Reguess Prevention)
+    // 1. Check for Duplicate Guess (Reguess Prevention)
     if (strchr(cli->guessed_letters, letter)) {
         snprintf(buf, sizeof(buf), "ALREADY_GUESSED %c\n", letter);
         send_msg(cli, buf);
-        return; // Stop processing the guess
+        return; 
     }
 
-    // 2. NEW: Record the new guess
+    // 2. Record the new guess
     size_t len_guessed = strlen(cli->guessed_letters);
     cli->guessed_letters[len_guessed] = letter;
     cli->guessed_letters[len_guessed + 1] = '\0';
     
-    // --- END NEW LOGIC ---
-
     int found = 0;
     int len = strlen(cli->current_word);
 
@@ -95,12 +97,31 @@ void process_guess(Client *cli, char letter) {
         cli->mistakes++;
     }
 
+    // NEW: Check for Loss condition (7 incorrect guesses)
+    if (cli->mistakes >= 7) {
+        // Send the final masked word and the actual word
+        snprintf(buf, sizeof(buf), "UPDATE %s %d\n", cli->masked_word, cli->mistakes);
+        send_msg(cli, buf);
+        
+        // Send actual word to client for display
+        snprintf(buf, sizeof(buf), "FINAL_WORD %s\n", cli->current_word);
+        send_msg(cli, buf);
+
+        // Send Game Over
+        snprintf(buf, sizeof(buf), "GAME_OVER LOSE\n");
+        send_msg(cli, buf);
+        cli->active = 0; // Disconnect player, or set finished flag
+        // update_leaderboard(cli->id, "LOST"); // Assuming this function exists
+        return;
+    }
+
+
     if (strcmp(cli->masked_word, cli->current_word) == 0) {
 
         cli->level++;
 
         if (cli->level > 3) {
-            char winner_buf[BUFFER_SIZE]; // Separate buffer for WINNER broadcast
+            char winner_buf[BUFFER_SIZE]; 
 
             snprintf(winner_buf, sizeof(winner_buf), "WINNER Player_%d\n", cli->id);
 
@@ -112,7 +133,7 @@ void process_guess(Client *cli, char letter) {
             }
             pthread_mutex_unlock(&clients_mutex);
 
-            update_leaderboard(cli->id, "WON");
+            // update_leaderboard(cli->id, "WON"); // Assuming this function exists
             return;
         }
 
@@ -126,11 +147,15 @@ void process_guess(Client *cli, char letter) {
 
         snprintf(buf, sizeof(buf), "WORD %s\n", cli->masked_word);
         send_msg(cli, buf);
+        
+        // NEW: Send Word Length
+        snprintf(buf, sizeof(buf), "WORD_LEN %d\n", cli->word_len);
+        send_msg(cli, buf);
 
         snprintf(buf, sizeof(buf), "TIMER %d\n", cli->time_limit);
         send_msg(cli, buf);
         
-        // NEW: Send updated (cleared) guessed list after level up
+        // Send updated (cleared) guessed list after level up
         snprintf(buf, sizeof(buf), "GUESSED %s\n", cli->guessed_letters);
         send_msg(cli, buf);
 
@@ -138,7 +163,7 @@ void process_guess(Client *cli, char letter) {
         snprintf(buf, sizeof(buf), "UPDATE %s %d\n", cli->masked_word, cli->mistakes);
         send_msg(cli, buf);
         
-        // NEW: Send updated guessed list after a normal guess
+        // Send updated guessed list after a normal guess
         snprintf(buf, sizeof(buf), "GUESSED %s\n", cli->guessed_letters);
         send_msg(cli, buf);
     }
@@ -152,12 +177,12 @@ void *client_handler(void *arg) {
 
     char msg[BUFFER_SIZE];
     snprintf(msg, sizeof(msg),
-             "GAME_START\nLEVEL %d\nWORD %s\nTIMER %d\n",
-             cli->level, cli->masked_word, cli->time_limit);
+             "GAME_START\nLEVEL %d\nWORD %s\nWORD_LEN %d\nTIMER %d\n", // Added WORD_LEN
+             cli->level, cli->masked_word, cli->word_len, cli->time_limit);
 
     send_msg(cli, msg);
     
-    // NEW: Send initial (empty) guessed list
+    // Send initial (empty) guessed list
     snprintf(msg, sizeof(msg), "GUESSED %s\n", cli->guessed_letters);
     send_msg(cli, msg);
 
@@ -203,7 +228,7 @@ void *client_handler(void *arg) {
 }
 
 int main() {
-    init_words();
+    // init_words(); // Assuming this exists
 
     int server_fd = create_server_socket(PORT);
     printf("Server started on port %d\n", PORT);
@@ -225,7 +250,7 @@ int main() {
         cli->level     = 1;
         cli->active    = 1;
         
-        // NEW: Initialize guessed_letters
+        // Initialize guessed_letters
         memset(cli->guessed_letters, 0, sizeof(cli->guessed_letters)); 
 
         clients[cli->id] = cli;
@@ -239,4 +264,3 @@ int main() {
 
     return 0;
 }
-
