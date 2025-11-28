@@ -10,10 +10,10 @@ int create_server_socket(int port) {
     int opt = 1;
 
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
-        die("setsockopt");
+        die("socket failed");
 
     if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
-        die("setsockopt");
+        die("setsockopt failed");
 
     address.sin_family = AF_INET;
     if (inet_pton(AF_INET, "127.0.0.1", &(address.sin_addr)) <= 0)
@@ -21,9 +21,10 @@ int create_server_socket(int port) {
     address.sin_port = htons(port);
 
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
-        die("listen");
+        die("bind failed");
+
+    if (listen(server_fd, 10) < 0)
+        die("listen failed");
 
     return server_fd;
 }
-
-
