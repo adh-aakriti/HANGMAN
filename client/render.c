@@ -1,13 +1,10 @@
-// client/render.c
 #include "client.h"
 #include "../common/utils.h"
 #include <stdio.h>
 #include <string.h>
 
-// Global state variable (declared in client.h)
 extern GameState state;
 
-// NOTE: This function MUST be non-static because the prototype is in client.h
 void render_text(SDL_Renderer *ren, TTF_Font *font,
                  const char *txt, int x, int y, SDL_Color color) {
     if (!font || !txt) return;
@@ -27,7 +24,6 @@ void render_text(SDL_Renderer *ren, TTF_Font *font,
     SDL_DestroyTexture(tex);
 }
 
-// Renders text centered on the screen (assuming 800 width)
 static void render_centered_text(SDL_Renderer *ren, TTF_Font *font,
                                  const char *txt, int y, SDL_Color color) {
     int w, h;
@@ -35,23 +31,18 @@ static void render_centered_text(SDL_Renderer *ren, TTF_Font *font,
     render_text(ren, font, txt, (800 - w) / 2, y, color);
 }
 
-// FIX: This helper formats the word string with spaces between letters/dashes
 static char* format_word_display(const char *masked_word, int len, char *buffer) {
     buffer[0] = '\0';
-    // Use the length passed from the state
     for (int i = 0; i < len; i++) {
-        // Append the letter/blank followed by a space
         char temp[3] = {masked_word[i], ' ', '\0'};
         strcat(buffer, temp);
     }
-    // Remove the trailing space if the word is not empty
     if (len > 0) {
         buffer[strlen(buffer) - 1] = '\0';
     }
     return buffer;
 }
 
-// Renders the Hangman Figure based on mistake count (Max 7 mistakes for body parts)
 static void render_hangman(SDL_Renderer *ren, int mistakes) {
     int gallows_x = 100;
     int gallows_y = 400; 
@@ -59,9 +50,8 @@ static void render_hangman(SDL_Renderer *ren, int mistakes) {
     int head_radius = 15;
     int body_length = 40;
     
-    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255); // White color
+    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255); 
 
-    // --- Gallows Structure (Always drawn) ---
     SDL_RenderDrawLine(ren, gallows_x - 50, gallows_y, gallows_x + 50, gallows_y); 
     SDL_RenderDrawLine(ren, gallows_x, gallows_y, gallows_x, gallows_y - post_height); 
     SDL_RenderDrawLine(ren, gallows_x, gallows_y - post_height, gallows_x + 70, gallows_y - post_height); 
@@ -70,30 +60,29 @@ static void render_hangman(SDL_Renderer *ren, int mistakes) {
     int head_center_y = rope_top_y + head_radius * 2;
     SDL_RenderDrawLine(ren, rope_x, rope_top_y, rope_x, head_center_y - head_radius);
 
-    // --- Body Parts (7 mistakes) ---
-    if (mistakes >= 1) { // Head 
+    if (mistakes >= 1) { 
         SDL_Rect head = {rope_x - head_radius, head_center_y - head_radius, head_radius * 2, head_radius * 2};
         SDL_RenderDrawRect(ren, &head);
     }
     int body_top_y = head_center_y + head_radius;
     int body_bottom_y = body_top_y + body_length;
-    if (mistakes >= 2) { // Body
+    if (mistakes >= 2) { 
         SDL_RenderDrawLine(ren, rope_x, body_top_y, rope_x, body_bottom_y);
     }
     int shoulder_y = body_top_y + 5;
-    if (mistakes >= 3) { // Left Arm
+    if (mistakes >= 3) { 
         SDL_RenderDrawLine(ren, rope_x, shoulder_y, rope_x - 20, shoulder_y + 20);
     }
-    if (mistakes >= 4) { // Right Arm
+    if (mistakes >= 4) { 
         SDL_RenderDrawLine(ren, rope_x, shoulder_y, rope_x + 20, shoulder_y + 20);
     }
-    if (mistakes >= 5) { // Left Leg
+    if (mistakes >= 5) { 
         SDL_RenderDrawLine(ren, rope_x, body_bottom_y, rope_x - 25, body_bottom_y + 25);
     }
-    if (mistakes >= 6) { // Right Leg
+    if (mistakes >= 6) { 
         SDL_RenderDrawLine(ren, rope_x, body_bottom_y, rope_x + 25, body_bottom_y + 25);
     }
-    if (mistakes >= 7) { // Dead Face
+    if (mistakes >= 7) { 
         int eye_offset = head_radius / 3;
         SDL_RenderDrawLine(ren, rope_x - eye_offset, head_center_y - eye_offset, rope_x - head_radius + eye_offset, head_center_y + eye_offset);
         SDL_RenderDrawLine(ren, rope_x - eye_offset, head_center_y + eye_offset, rope_x - head_radius + eye_offset, head_center_y - eye_offset);
@@ -102,7 +91,6 @@ static void render_hangman(SDL_Renderer *ren, int mistakes) {
     }
 }
 
-// Renders the QWERTY keyboard overlay
 static void render_keyboard(SDL_Renderer *ren, TTF_Font *font) {
     int start_x = 100; 
     int start_y = 450;
@@ -127,7 +115,6 @@ static void render_keyboard(SDL_Renderer *ren, TTF_Font *font) {
             char letter = rows[r][i];
             SDL_Color key_color = unguessed_gray; 
             
-            // NOTE: state.guessed_letters and state.word_len are required in client.h
             if (strchr(state.guessed_letters, letter)) {
                 if (strchr(state.masked_word, letter)) {
                     key_color = correct_green;
@@ -163,14 +150,12 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
 
     pthread_mutex_lock(&state.state_mutex);
 
-    // 1. Top Line (Level, Time, Mistakes)
     char top_line[128];
     snprintf(top_line, sizeof(top_line),
              "Level: %d   Time: %d   Mistakes: %d/7", 
              state.level, state.timer_val, state.mistakes);
     render_text(renderer, font, top_line, 20, 20, white);
 
-    // 2. Word Length Message (Position: Y=70)
     char len_msg[64];
     if (state.word_len > 0) {
         snprintf(len_msg, sizeof(len_msg), "The word has %d letters", state.word_len);
@@ -180,21 +165,16 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
         render_centered_text(renderer, font, len_msg, 70, white);
     }
 
-    // 3. Word Display (Dashes and Guessed Letters - Position: Y=110)
     char word_display_buf[128];
-    // FIX: This calls the helper function to format the word with spaces
     format_word_display(state.masked_word, state.word_len, word_display_buf);
     render_centered_text(renderer, font, word_display_buf, 110, white); 
 
-    // 4. Status Message (Centered - Position: Y=160)
     render_centered_text(renderer, font, state.status_msg, 160, white); 
 
-    // 5. Hangman Figure (uses mistakes count)
     render_hangman(renderer, state.mistakes);
     
     pthread_mutex_unlock(&state.state_mutex);
 
-    // 6. Keyboard 
     render_keyboard(renderer, font); 
     
     SDL_RenderPresent(renderer);
