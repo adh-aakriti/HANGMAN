@@ -14,6 +14,7 @@ include_directories(
     client
     ${SDL2_INCLUDE_DIRS}
     ${TTF_INC}
+    /opt/homebrew/include/SDL2
 )
 
 add_executable(server_app
@@ -34,3 +35,4 @@ add_executable(client_app
     common/utils.c
 )
 target_link_libraries(client_app ${SDL2_LIBRARIES} ${TTF_LIB} pthread)
+
