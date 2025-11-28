@@ -110,8 +110,8 @@ void process_guess(Client *cli, char letter) {
         // Send Game Over
         snprintf(buf, sizeof(buf), "GAME_OVER LOSE\n");
         send_msg(cli, buf);
-        cli->active = 0; // Disconnect player, or set finished flag
-        // update_leaderboard(cli->id, "LOST"); // Assuming this function exists
+        cli->active = 0; 
+        // update_leaderboard(cli->id, "LOST"); 
         return;
     }
 
@@ -133,7 +133,7 @@ void process_guess(Client *cli, char letter) {
             }
             pthread_mutex_unlock(&clients_mutex);
 
-            // update_leaderboard(cli->id, "WON"); // Assuming this function exists
+            // update_leaderboard(cli->id, "WON");
             return;
         }
 
@@ -177,7 +177,7 @@ void *client_handler(void *arg) {
 
     char msg[BUFFER_SIZE];
     snprintf(msg, sizeof(msg),
-             "GAME_START\nLEVEL %d\nWORD %s\nWORD_LEN %d\nTIMER %d\n", // Added WORD_LEN
+             "GAME_START\nLEVEL %d\nWORD %s\nWORD_LEN %d\nTIMER %d\n", 
              cli->level, cli->masked_word, cli->word_len, cli->time_limit);
 
     send_msg(cli, msg);
@@ -228,7 +228,7 @@ void *client_handler(void *arg) {
 }
 
 int main() {
-    // init_words(); // Assuming this exists
+    // init_words(); 
 
     int server_fd = create_server_socket(PORT);
     printf("Server started on port %d\n", PORT);
