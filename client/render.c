@@ -7,7 +7,7 @@
 // Global state variable (declared in client.h)
 extern GameState state;
 
-// NOTE: This function MUST be non-static because the prototype is in client.h
+// NOTE: Renamed to render_text to match client.h
 void render_text(SDL_Renderer *ren, TTF_Font *font,
                  const char *txt, int x, int y, SDL_Color color) {
     if (!font || !txt) return;
@@ -35,34 +35,28 @@ static void render_centered_text(SDL_Renderer *ren, TTF_Font *font,
     render_text(ren, font, txt, (800 - w) / 2, y, color);
 }
 
-// FIX: This function takes the masked_word from the client state and adds spaces.
+// Function to space out the letters for clarity (displays dashes and letters)
 static char* format_word_display(const char *masked_word, int len, char *buffer) {
     buffer[0] = '\0';
-    // Use the length passed from the state
     for (int i = 0; i < len; i++) {
-        // Append the letter/blank followed by a space
         char temp[3] = {masked_word[i], ' ', '\0'};
         strcat(buffer, temp);
     }
-    // Remove the trailing space if the word is not empty
     if (len > 0) {
         buffer[strlen(buffer) - 1] = '\0';
     }
     return buffer;
 }
 
-// Renders the Hangman Figure based on mistake count (Max 7 mistakes for body parts)
+// Renders the Hangman Figure based on mistake count
 static void render_hangman(SDL_Renderer *ren, int mistakes) {
-    // Hangman gallows positioning (Left side of the screen)
     int gallows_x = 100;
-    int gallows_y = 400; // Base line
+    int gallows_y = 400; 
     int post_height = 200;
     int head_radius = 15;
     int body_length = 40;
-    int arm_length = 20;
-    int leg_length = 25;
     
-    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255); // White color
+    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255); 
 
     // --- Gallows Structure (Always drawn) ---
     SDL_RenderDrawLine(ren, gallows_x - 50, gallows_y, gallows_x + 50, gallows_y); 
@@ -74,45 +68,34 @@ static void render_hangman(SDL_Renderer *ren, int mistakes) {
     SDL_RenderDrawLine(ren, rope_x, rope_top_y, rope_x, head_center_y - head_radius);
 
     // --- Body Parts (7 mistakes) ---
-    // MISTAKE 1: Head 
-    if (mistakes >= 1) {
+    if (mistakes >= 1) { // Head 
         SDL_Rect head = {rope_x - head_radius, head_center_y - head_radius, head_radius * 2, head_radius * 2};
         SDL_RenderDrawRect(ren, &head);
     }
-    
-    // MISTAKE 2: Body
     int body_top_y = head_center_y + head_radius;
     int body_bottom_y = body_top_y + body_length;
-    if (mistakes >= 2) {
+    if (mistakes >= 2) { // Body
         SDL_RenderDrawLine(ren, rope_x, body_top_y, rope_x, body_bottom_y);
     }
-    
-    // MISTAKE 3: Left Arm
     int shoulder_y = body_top_y + 5;
-    if (mistakes >= 3) {
-        SDL_RenderDrawLine(ren, rope_x, shoulder_y, rope_x - arm_length, shoulder_y + arm_length);
+    if (mistakes >= 3) { // Left Arm
+        SDL_RenderDrawLine(ren, rope_x, shoulder_y, rope_x - 20, shoulder_y + 20);
     }
-    
-    // MISTAKE 4: Right Arm
-    if (mistakes >= 4) {
-        SDL_RenderDrawLine(ren, rope_x, shoulder_y, rope_x + arm_length, shoulder_y + arm_length);
+    if (mistakes >= 4) { // Right Arm
+        SDL_RenderDrawLine(ren, rope_x, shoulder_y, rope_x + 20, shoulder_y + 20);
     }
-    
-    // MISTAKE 5: Left Leg
-    if (mistakes >= 5) {
-        SDL_RenderDrawLine(ren, rope_x, body_bottom_y, rope_x - leg_length, body_bottom_y + leg_length);
+    if (mistakes >= 5) { // Left Leg
+        SDL_RenderDrawLine(ren, rope_x, body_bottom_y, rope_x - 25, body_bottom_y + 25);
     }
-    
-    // MISTAKE 6: Right Leg
-    if (mistakes >= 6) {
-        SDL_RenderDrawLine(ren, rope_x, body_bottom_y, rope_x + leg_length, body_bottom_y + leg_length);
+    if (mistakes >= 6) { // Right Leg
+        SDL_RenderDrawLine(ren, rope_x, body_bottom_y, rope_x + 25, body_bottom_y + 25);
     }
-    
-    // MISTAKE 7 (Final Mistake): Dead Face (X eyes)
-    if (mistakes >= 7) {
+    if (mistakes >= 7) { // Dead Face
         int eye_offset = head_radius / 3;
+        // Left Eye (X)
         SDL_RenderDrawLine(ren, rope_x - eye_offset, head_center_y - eye_offset, rope_x - head_radius + eye_offset, head_center_y + eye_offset);
         SDL_RenderDrawLine(ren, rope_x - eye_offset, head_center_y + eye_offset, rope_x - head_radius + eye_offset, head_center_y - eye_offset);
+        // Right Eye (X)
         SDL_RenderDrawLine(ren, rope_x + head_radius - eye_offset, head_center_y - eye_offset, rope_x + eye_offset, head_center_y + eye_offset);
         SDL_RenderDrawLine(ren, rope_x + head_radius - eye_offset, head_center_y + eye_offset, rope_x + eye_offset, head_center_y - eye_offset);
     }
@@ -141,12 +124,9 @@ static void render_keyboard(SDL_Renderer *ren, TTF_Font *font) {
         
         for (int i = 0; rows[r][i] != '\0'; i++) {
             char letter = rows[r][i];
-            
             SDL_Color key_color = unguessed_gray; 
             
             if (strchr(state.guessed_letters, letter)) {
-                
-                // Check if the guessed letter is currently visible in the masked word
                 if (strchr(state.masked_word, letter)) {
                     key_color = correct_green;
                 } else {
@@ -194,11 +174,12 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
         snprintf(len_msg, sizeof(len_msg), "The word has %d letters", state.word_len);
         render_centered_text(renderer, font, len_msg, 70, white);
     } else {
+        // This is the message you are currently seeing
         snprintf(len_msg, sizeof(len_msg), "Waiting for game start...");
         render_centered_text(renderer, font, len_msg, 70, white);
     }
 
-    // 3. Word Display (Centered and with spacing - Position: Y=110)
+    // 3. Word Display (Dashes and Guessed Letters - Position: Y=110)
     char word_display_buf[128];
     format_word_display(state.masked_word, state.word_len, word_display_buf);
     render_centered_text(renderer, font, word_display_buf, 110, white); 
