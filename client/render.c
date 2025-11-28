@@ -9,6 +9,7 @@ void render_text(SDL_Renderer *ren, TTF_Font *font,
                  const char *txt, int x, int y, SDL_Color color) {
     if (!font || !txt) return;
 
+    // Use the color passed in the argument
     SDL_Surface *surf = TTF_RenderText_Solid(font, txt, color);
     if (!surf) return;
 
@@ -146,16 +147,19 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
     SDL_SetRenderDrawColor(renderer, 20, 20, 25, 255);
     SDL_RenderClear(renderer);
     
+    // Define the color explicitly here for all calls
     SDL_Color white = {255, 255, 255, 255};
 
     pthread_mutex_lock(&state.state_mutex);
 
+    // 1. Top Line (Level, Time, Mistakes)
     char top_line[128];
     snprintf(top_line, sizeof(top_line),
              "Level: %d   Time: %d   Mistakes: %d/7", 
              state.level, state.timer_val, state.mistakes);
     render_text(renderer, font, top_line, 20, 20, white);
 
+    // 2. Word Length Message (Position: Y=70)
     char len_msg[64];
     if (state.word_len > 0) {
         snprintf(len_msg, sizeof(len_msg), "The word has %d letters", state.word_len);
@@ -165,16 +169,20 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
         render_centered_text(renderer, font, len_msg, 70, white);
     }
 
+    // 3. Word Display (Dashes and Guessed Letters - Position: Y=110)
     char word_display_buf[128];
     format_word_display(state.masked_word, state.word_len, word_display_buf);
     render_centered_text(renderer, font, word_display_buf, 110, white); 
 
+    // 4. Status Message (Centered - Position: Y=160)
     render_centered_text(renderer, font, state.status_msg, 160, white); 
 
+    // 5. Hangman Figure (uses mistakes count)
     render_hangman(renderer, state.mistakes);
     
     pthread_mutex_unlock(&state.state_mutex);
 
+    // 6. Keyboard 
     render_keyboard(renderer, font); 
     
     SDL_RenderPresent(renderer);
