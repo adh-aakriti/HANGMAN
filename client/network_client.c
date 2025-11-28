@@ -4,71 +4,70 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <stdio.h>
 #include <string.h>
-#include <pthread.h>
+#include <stdio.h>
 
-// send the guess to the server
-void send_guess(char letter){
-  char msg[32];
-  snprintf(msg, sizeof(msg), "GUESS %c", letter);
-  (void)send(state.socket_fd, msg, strlen(msg), 0);
+void send_guess(char letter) {
+    char buf[64];
+    snprintf(buf, sizeof(buf), "GUESS %c\n", letter);
+    send(state.socket_fd, buf, strlen(buf), 0);
 }
 
-// parralell running to catch server messages
 void *network_listen_thread(void *arg) {
-  (void)arg;
-  char buf[1024];
+    (void)arg;
 
-  while (state.running) {
-    int n = read(state.socket_fd, buf, sizeof(buf) - 1);
-    if (n <= 0) {
-      pthread_mutex_lock(&state.state_mutex);
-      strcpy(state.status_msg, "disconnected.");
-      state.running = 0;
-      pthread_mutex_unlock(&state.state_mutex);
-      break;
+    char buffer[1024];
+
+    while (state.running) {
+        int n = read(state.socket_fd, buffer, sizeof(buffer) - 1);
+        if (n <= 0) {
+            snprintf(state.status_msg, sizeof(state.status_msg),
+                     "Disconnected from server.");
+            state.running = 0;
+            break;
+        }
+
+        buffer[n] = '\0';
+
+        pthread_mutex_lock(&state.state_mutex);
+
+        char *line = strtok(buffer, "\n");
+        while (line) {
+
+            if (strncmp(line, "LEVEL", 5) == 0) {
+                sscanf(line, "LEVEL %d", &state.level);
+
+            } else if (strncmp(line, "WORD", 4) == 0) {
+                sscanf(line, "WORD %63s", state.masked_word);
+
+            } else if (strncmp(line, "UPDATE", 6) == 0) {
+                sscanf(line, "UPDATE %63s %d",
+                       state.masked_word, &state.mistakes);
+
+            } else if (strncmp(line, "TIMER", 5) == 0) {
+                sscanf(line, "TIMER %d", &state.timer_val);
+
+            } else if (strncmp(line, "TIME_UP", 7) == 0) {
+                snprintf(state.status_msg, sizeof(state.status_msg),
+                         "Time's up! New word assigned.");
+
+            } else if (strncmp(line, "NEW_WORD", 8) == 0) {
+                sscanf(line, "NEW_WORD %63s", state.masked_word);
+                state.mistakes = 0;
+
+            } else if (strncmp(line, "WINNER", 6) == 0) {
+                char name[32];
+                sscanf(line, "WINNER %31s", name);
+                snprintf(state.status_msg, sizeof(state.status_msg),
+                         "Winner: %s", name);
+                state.game_over = 1;
+            }
+
+            line = strtok(NULL, "\n");
+        }
+
+        pthread_mutex_unlock(&state.state_mutex);
     }
 
-    buf[n] = '\0';
-    pthread_mutex_lock(&state.state_mutex);
-
-    char *ln = strtok(buf, "\n");
-    while (ln) {
-      if (strncmp(ln, "LEVEL", 5) == 0)
-        sscanf(ln, "LEVEL %d", &state.level);
-
-      else if (strncmp(ln, "WORD", 4) == 0)
-        sscanf(ln, "WORD %s", state.masked_word);
-
-      else if (strncmp(ln, "UPDATE", 6) == 0)
-        sscanf(ln, "UPDATE %s %d", state.masked_word, &state.mistakes);
-
-      else if (strncmp(ln, "TIMER", 5) == 0)
-          sscanf(ln, "TIMER %d", state.timer_val);
-
-      else if (strncmp(ln, "NEW_WORD", 8) == 0) {
-        sscanf(ln, "NEW_WORD %s", state.masked_word);
-        state.mistakes = 0;
-      }
-
-      else if (strncmp(ln, "WINNER", 6) == 0) {
-        char winner[32] = {0};
-        sscanf(ln, "WINNER %31s", winner);
-        snprintf(state.status_msg, sizeof(state.status.msg),
-          "winner: %s", winner);
-        state.game_over = 1;
-      }
-
-      ln = strtok(NULL, "\n");
-    }
-    
-    pthread_mutex_unlock(&state.state_mutex);
-  }
-
-  return NULL;
-}   
-
-
-
-
+    return NULL;
+}
