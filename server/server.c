@@ -23,6 +23,7 @@ void setup_level(Client *cli) {
 
     strcpy(cli->current_word, get_random_word(len));
 
+    cli->word_len = len;
     cli->time_limit  = time_sec;
     cli->start_time  = time(NULL);
     cli->mistakes    = 0;
@@ -238,3 +239,4 @@ int main() {
 
     return 0;
 }
+
