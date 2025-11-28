@@ -37,6 +37,12 @@ static int connect_to_server(void) {
 }
 
 int main(void) {
+    const char *server_ip = "127.0.0.1";  // default for local testing
+
+    if (argc >= 2) {
+        server_ip = argv[1];              // user-specified IP
+    }
+
     memset(&state, 0, sizeof(state));
     pthread_mutex_init(&state.state_mutex, NULL);
 
@@ -104,4 +110,5 @@ int main(void) {
 
     return 0;
 }
+
 
