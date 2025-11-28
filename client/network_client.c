@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 
-extern GameState state;
+extern GameState state; 
 
 void send_guess(char letter) {
     char buf[64];
