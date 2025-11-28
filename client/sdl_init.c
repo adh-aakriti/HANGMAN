@@ -1,6 +1,6 @@
 #include "client.h"
 #include "../common/utils.h"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <SDL2/SDL_ttf.h>
 
 // Init SDL + Font system
@@ -26,4 +26,5 @@ void cleanup_sdl(SDL_Window* win, SDL_Renderer* ren) {
     TTF_Quit();
     SDL_Quit();
 }
+
 
