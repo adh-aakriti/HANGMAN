@@ -30,6 +30,8 @@ void setup_level(Client *cli) {
     for (int i = 0; i < len; i++) {
         cli->current_word[i] = toupper((unsigned char)cli->current_word[i]);
     }
+
+    cli->current_word[len] = '\0';
     
     cli->word_len = len; // Correctly sets word length
     cli->time_limit  = time_sec;
@@ -274,6 +276,7 @@ int main() {
 
     return 0;
 }
+
 
 
 
