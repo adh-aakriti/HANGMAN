@@ -163,8 +163,8 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
 
     if (state.game_over) {
       int used_time = 0;
-      if (state.total_time > 0 && state.timer_val >= 0) {
-          used_time = state.total_time - state.timer_val;
+      if (state.final_time_sec > 0 && state.timer_val >= 0) {
+          used_time = state.final_time_sec - state.timer_val;
           if (used_time < 0) used_time = 0;
       }
   
@@ -210,6 +210,7 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
     
     SDL_RenderPresent(renderer);
 }
+
 
 
 
