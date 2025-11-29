@@ -23,6 +23,10 @@ void setup_level(Client *cli) {
 
     strcpy(cli->current_word, get_random_word(len));
 
+    printf("[DEBUG] Player %d level %d word: %s\n",
+       cli->id, cli->level, cli->current_word);
+    fflush(stdout);
+
     cli->word_len = len; // Correctly sets word length
     cli->time_limit  = time_sec;
     cli->start_time  = time(NULL);
@@ -266,3 +270,4 @@ int main() {
 
     return 0;
 }
+
