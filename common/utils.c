@@ -6,7 +6,12 @@ void die(const char *msg) {
 }
 
 void trim_newline(char *str) {
-    char *pos;
-    if ((pos = strchr(str, '\n')) != NULL)
-        *pos = '\0';
+    if (!str) return;
+
+    for (char *p = str; *p; ++p) {
+        if (*p == '\n' || *p == '\r') {
+            *p = '\0';
+            break;
+        }
+    }
 }
