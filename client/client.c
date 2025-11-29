@@ -74,17 +74,19 @@ int main(int argc, char const *argv[]){
     SDL_Event ev;
     Uint32 last_timer_tick = SDL_GetTicks();
 
-    while (state.running && !state.game_over) {
+    while (state.running) {
 
         while (SDL_PollEvent(&ev)) {
             if (ev.type == SDL_QUIT) {
                 state.running = 0;
             } else if (ev.type == SDL_KEYDOWN) {
                 SDL_Keycode key = ev.key.keysym.sym;
-
-                if (key >= SDLK_a && key <= SDLK_z) {
+            
+                if (!state.game_over && key >= SDLK_a && key <= SDLK_z) {
                     char letter = (char)('a' + (key - SDLK_a));
                     send_guess(letter);
+                } else if (state.game_over && key == SDLK_ESCAPE) {
+                    state.running = 0; // allow ESC to close after end screen
                 }
             }
         }
@@ -94,11 +96,10 @@ int main(int argc, char const *argv[]){
             last_timer_tick = now;
             
             pthread_mutex_lock(&state.state_mutex);
-            if (state.timer_val > 0) {
+            if (!state.game_over && state.timer_val > 0) {
                 state.timer_val--;
             }
             pthread_mutex_unlock(&state.state_mutex);
-            
         }
 
         render_game(ren, font);
@@ -116,5 +117,6 @@ int main(int argc, char const *argv[]){
 
     return 0;
 }
+
 
 
