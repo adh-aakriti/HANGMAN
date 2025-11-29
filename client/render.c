@@ -40,7 +40,7 @@ static char* format_word_display(const char *masked_word, int len, char *buffer)
     buffer[0] = '\0';
     for (int i = 0; i < len; i++) {
         // Append the letter/blank followed by a space
-        char temp[3] = {masked_word[i], ' ', '\0'};
+        char temp[4] = {masked_word[i], ' ',' ', '\0'};
         strcat(buffer, temp);
     }
     return buffer;
@@ -202,12 +202,12 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
     snprintf(top_line, sizeof(top_line),
              "Level: %d   Time: %d   Mistakes: %d/7", 
              state.level, state.timer_val, state.mistakes);
-    render_text(renderer, font, top_line, 20, 20, white);
+    render_centered_text(renderer, font, top_line, 80, white);
 
     // 2. Word Display (Centered and with spacing)
     char word_display_buf[128];
     format_word_display(state.masked_word, state.word_len, word_display_buf);
-    render_centered_text(renderer, font, word_display_buf, 100, white); 
+    render_centered_text(renderer, font, word_display_buf, 180, white); 
 
     // 3. Status Message (Centered)
     render_centered_text(renderer, font, state.status_msg, 160, white); 
@@ -223,3 +223,4 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
     
     SDL_RenderPresent(renderer);
 }
+
