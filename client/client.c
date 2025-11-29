@@ -22,11 +22,11 @@ static int connect_to_server(const char *server_ip) {
     addr.sin_family = AF_INET;
     addr.sin_port = htons(PORT);
 
-    // If no IP given, default to 127.0.0.1
-    if (!server_ip || !*server_ip) {
+    // If no IP or localhost -> use loopback directly, no inet_pton
+    if (!server_ip || strcmp(server_ip, "127.0.0.1") == 0) {
         addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
     } else {
-        // Try to parse the given IP (e.g. "127.0.0.1")
+        // Only use inet_pton for *real* external IPs
         if (inet_pton(AF_INET, server_ip, &addr.sin_addr) != 1) {
             perror("inet_pton");
             close(fd);
@@ -125,6 +125,7 @@ int main(int argc, char const *argv[]){
 
     return 0;
 }
+
 
 
 
