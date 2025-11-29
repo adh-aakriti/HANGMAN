@@ -55,7 +55,12 @@ void *network_listen_thread(void *arg) {
                 state.word_len = (int)strlen(state.masked_word);
 
             } else if (strncmp(line, "TIMER", 5) == 0) {
-                sscanf(line, "TIMER %d", &state.timer_val);
+                int t;
+                sscanf(line, "TIMER %d", &t);
+                state.timer_val = t;
+                if (state.total_time == 0) {   
+                    state.total_time = t;
+                }
 
             } else if (strncmp(line, "TIME_UP", 7) == 0) {
                 snprintf(state.status_msg, sizeof(state.status_msg),
@@ -89,6 +94,7 @@ void *network_listen_thread(void *arg) {
                 if (strcmp(outcome, "LOSE") == 0) {
                     snprintf(state.status_msg, sizeof(state.status_msg), 
                              "Game Over! The word was: %s", state.current_word);
+                    state.win = 0;
                 }
                 state.game_over = 1;
 
@@ -97,6 +103,7 @@ void *network_listen_thread(void *arg) {
                 sscanf(line, "WINNER %31s", name);
                 snprintf(state.status_msg, sizeof(state.status_msg),
                          "Winner: %s", name);
+                state.win = 1;
                 state.game_over = 1;
             }
 
@@ -108,6 +115,7 @@ void *network_listen_thread(void *arg) {
 
     return NULL;
 }
+
 
 
 
