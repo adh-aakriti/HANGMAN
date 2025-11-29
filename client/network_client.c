@@ -39,6 +39,9 @@ void *network_listen_thread(void *arg) {
             if (strncmp(line, "LEVEL", 5) == 0) {
                 sscanf(line, "LEVEL %d", &state.level);
 
+            } else if (strncmp(line, "WORD_LEN", 8) == 0) {
+                sscanf(line, "WORD_LEN %d", &state.word_len);
+
             } else if (strncmp(line, "WORD", 4) == 0) {
                 sscanf(line, "WORD %63s", state.masked_word);
                 state.word_len = (int)strlen(state.masked_word);
@@ -68,9 +71,6 @@ void *network_listen_thread(void *arg) {
                 sscanf(line, "ALREADY_GUESSED %c", &letter);
                 snprintf(state.status_msg, sizeof(state.status_msg), "Letter '%c' already guessed.", letter);
 
-            } else if (strncmp(line, "WORD_LEN", 8) == 0) {
-                sscanf(line, "WORD_LEN %d", &state.word_len);
-
             } else if (strncmp(line, "FINAL_WORD", 10) == 0) {
                 sscanf(line, "FINAL_WORD %63s", state.current_word);
 
@@ -99,5 +99,6 @@ void *network_listen_thread(void *arg) {
 
     return NULL;
 }
+
 
 
