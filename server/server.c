@@ -91,11 +91,11 @@ void process_guess(Client *cli, char letter) {
     int len = strlen(cli->current_word);
 
     for (int i = 0; i < len; i++) {
-        if (cli->current_word[i] == letter) {
-            cli->masked_word[i] = letter;
-            found = 1;
-        }
+    if (toupper((unsigned char)cli->current_word[i]) == letter) {
+        cli->masked_word[i] = letter;
+        found = 1;
     }
+}
 
     if (!found) {
         cli->mistakes++;
@@ -270,4 +270,5 @@ int main() {
 
     return 0;
 }
+
 
