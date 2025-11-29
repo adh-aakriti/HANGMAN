@@ -21,6 +21,7 @@ typedef struct {
     int word_len;             
     char current_word[64];
 
+    Uint32 start_ticks;
     int total_time; 
     int win;
 
@@ -38,4 +39,5 @@ void *network_listen_thread(void *arg);
 void send_guess(char letter);
 
 #endif
+
 
