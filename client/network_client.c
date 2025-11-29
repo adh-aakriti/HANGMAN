@@ -58,8 +58,8 @@ void *network_listen_thread(void *arg) {
                 int t;
                 sscanf(line, "TIMER %d", &t);
                 state.timer_val = t;
-                if (state.total_time == 0) {   
-                    state.total_time = t;
+                if (state.final_time_sec == 0) {   
+                    state.final_time_sec = t;
                 }
 
             } else if (strncmp(line, "TIME_UP", 7) == 0) {
@@ -115,6 +115,7 @@ void *network_listen_thread(void *arg) {
 
     return NULL;
 }
+
 
 
 
