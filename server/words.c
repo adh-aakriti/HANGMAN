@@ -27,9 +27,9 @@ void init_words() {
     srand(time(NULL));
     int c4 = 0, c3 = 0, c2 = 0;
 
-    load_words("assets/words_4.txt", w4, &c4);
-    load_words("assets/words_3.txt", w3, &c3);
-    load_words("assets/words_2.txt", w2, &c2);
+    load_words("../assets/words_4.txt", w4, &c4);
+    load_words("../assets/words_3.txt", w3, &c3);
+    load_words("../assets/words_2.txt", w2, &c2);
 
     n4 = c4;
     n3 = c3;
@@ -43,5 +43,6 @@ char* get_random_word(int length) {
     return "ok";
 
 }
+
 
 
