@@ -20,8 +20,8 @@ void *network_listen_thread(void *arg) {
 
     char buffer[1024];
 
-    while (state.running) {
-        int n = read(state.socket_fd, buffer, sizeof(buffer) - 1);
+while (state.running) {
+    int n = read(state.socket_fd, buffer, sizeof(buffer) - 1);
         if (n <= 0) {
             if (!state.game_over) {
                 snprintf(state.status_msg, sizeof(state.status_msg),
@@ -117,6 +117,7 @@ void *network_listen_thread(void *arg) {
 
     return NULL;
 }
+
 
 
 
