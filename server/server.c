@@ -34,8 +34,6 @@ void setup_level(Client *cli) {
     cli->current_word[len] = '\0';
     
     cli->word_len = len; // Correctly sets word length
-    cli->time_limit  = time_sec;
-    cli->start_time  = time(NULL);
     cli->mistakes    = 0;
     
     // Clear guessed letters on new level
@@ -276,6 +274,7 @@ int main() {
 
     return 0;
 }
+
 
 
 
