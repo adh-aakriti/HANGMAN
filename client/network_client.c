@@ -41,6 +41,7 @@ void *network_listen_thread(void *arg) {
 
             } else if (strncmp(line, "WORD", 4) == 0) {
                 sscanf(line, "WORD %63s", state.masked_word);
+                state.word_len = (int)strlen(state.masked_word);
 
             } else if (strncmp(line, "UPDATE", 6) == 0) {
                 sscanf(line, "UPDATE %63s %d",
@@ -96,3 +97,4 @@ void *network_listen_thread(void *arg) {
 
     return NULL;
 }
+
