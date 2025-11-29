@@ -207,7 +207,7 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
     // 2. Word Display (Centered and with spacing)
     char word_display_buf[128];
     format_word_display(state.masked_word, state.word_len, word_display_buf);
-    render_centered_text(renderer, font, word_display_buf, 180, white); 
+    render_centered_text(renderer, font, word_display_buf, 300, white); 
 
     // 3. Status Message (Centered)
     render_centered_text(renderer, font, state.status_msg, 160, white); 
@@ -223,4 +223,5 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font) {
     
     SDL_RenderPresent(renderer);
 }
+
 
