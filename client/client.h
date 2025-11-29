@@ -22,7 +22,7 @@ typedef struct {
     char current_word[64];
 
     Uint32 start_ticks;
-    int total_time; 
+    int final_time_sec; 
     int win;
 
     pthread_mutex_t state_mutex;
@@ -39,5 +39,6 @@ void *network_listen_thread(void *arg);
 void send_guess(char letter);
 
 #endif
+
 
 
