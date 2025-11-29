@@ -46,6 +46,7 @@ void *network_listen_thread(void *arg) {
             } else if (strncmp(line, "UPDATE", 6) == 0) {
                 sscanf(line, "UPDATE %63s %d",
                        state.masked_word, &state.mistakes);
+                state.word_len = (int)strlen(state.masked_word);
 
             } else if (strncmp(line, "TIMER", 5) == 0) {
                 sscanf(line, "TIMER %d", &state.timer_val);
@@ -57,6 +58,7 @@ void *network_listen_thread(void *arg) {
             } else if (strncmp(line, "NEW_WORD", 8) == 0) {
                 sscanf(line, "NEW_WORD %63s", state.masked_word);
                 state.mistakes = 0;
+                state.word_len = (int)strlen(state.masked_word);
             
             } else if (strncmp(line, "GUESSED", 7) == 0) {
                 sscanf(line, "GUESSED %26s", state.guessed_letters);
@@ -97,4 +99,5 @@ void *network_listen_thread(void *arg) {
 
     return NULL;
 }
+
 
