@@ -51,7 +51,8 @@ int main(int argc, char const *argv[]){
     memset(&state, 0, sizeof(state));
     pthread_mutex_init(&state.state_mutex, NULL);
 
-    state.socket_fd = connect_to_server();
+    state.socket_fd = connect_to_server(server_ip);
+    
     if (state.socket_fd < 0) {
         fprintf(stderr, "could not connect to server\n");
         return 1;
@@ -122,6 +123,7 @@ int main(int argc, char const *argv[]){
 
     return 0;
 }
+
 
 
 
