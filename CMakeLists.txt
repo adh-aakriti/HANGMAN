@@ -6,11 +6,24 @@ set(CMAKE_C_FLAGS "-Wall -Wextra -pthread")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
-find_package(SDL2 REQUIRED)
-# Usamos pkg-config para obtener la ruta de los headers de SDL2
-execute_process(COMMAND pkg-config --cflags sdl2 OUTPUT_VARIABLE SDL2_CFLAGS)
+# -----------------------------------------------------------
+# BLOQUE DE CONFIGURACIÓN SDL2 UNIVERSAL
+# -----------------------------------------------------------
 
-# Incluimos los directorios que nos da pkg-config
+# 1. Búsqueda Estándar de SDL2 (funciona en la mayoría de los casos)
+find_package(SDL2 REQUIRED)
+
+# 2. Lógica Condicional para macOS (Homebrew)
+# Esto solo se ejecuta si el sistema operativo detectado es macOS.
+if(APPLE)
+    # Incluir las rutas de Homebrew para encontrar los headers y librerías de SDL2
+    include_directories(/opt/homebrew/include/SDL2)
+    link_directories(/opt/homebrew/lib)
+endif()
+
+# 3. Solución de Respaldo para Entornos Problemáticos (tu WSL/Linux)
+# Esta línea fuerza la inclusión de la ruta estándar de Linux,
+# asegurando que siempre funcione en tu WSL.
 include_directories(${SDL2_CFLAGS})
 include_directories(/usr/include/SDL2)
 
