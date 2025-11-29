@@ -10,7 +10,7 @@
 
 GameState state;
 
-static int connect_to_server(void) {
+static int connect_to_server(const char *server_ip) {
     int fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd < 0) {
         perror("socket");
@@ -117,6 +117,7 @@ int main(int argc, char const *argv[]){
 
     return 0;
 }
+
 
 
 
