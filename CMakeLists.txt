@@ -6,10 +6,13 @@ set(CMAKE_C_FLAGS "-Wall -Wextra -pthread")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
-include_directories(/opt/homebrew/include/SDL2)
-link_directories(/opt/homebrew/lib)
-
 find_package(SDL2 REQUIRED)
+# Usamos pkg-config para obtener la ruta de los headers de SDL2
+execute_process(COMMAND pkg-config --cflags sdl2 OUTPUT_VARIABLE SDL2_CFLAGS)
+
+# Incluimos los directorios que nos da pkg-config
+include_directories(${SDL2_CFLAGS})
+include_directories(/usr/include/SDL2)
 
 set(SDL2_LIBRARIES SDL2)
 set(SDL2_TTF_LIBRARY SDL2_ttf)
@@ -39,4 +42,5 @@ add_executable(hangman_client
     common/utils.c
 )
 
-target_link_libraries(hangman_client SDL2 SDL2_ttf pthread)
+# target_link_libraries(hangman_client SDL2 SDL2_ttf pthread)
+target_link_libraries(hangman_client ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARY} pthread)
