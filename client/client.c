@@ -61,6 +61,9 @@ int main(int argc, char const *argv[]){
     }
 
     state.running = 1;
+    state.start_ticks    = SDL_GetTicks();
+    state.final_time_sec = 0;
+    state.win            = 0;
 
     pthread_t net_thread;
     if (pthread_create(&net_thread, NULL, network_listen_thread, NULL) != 0) {
@@ -125,6 +128,7 @@ int main(int argc, char const *argv[]){
 
     return 0;
 }
+
 
 
 
