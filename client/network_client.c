@@ -23,9 +23,11 @@ void *network_listen_thread(void *arg) {
     while (state.running) {
         int n = read(state.socket_fd, buffer, sizeof(buffer) - 1);
         if (n <= 0) {
-            snprintf(state.status_msg, sizeof(state.status_msg),
-                     "Disconnected from server.");
-            state.running = 0;
+            if (!state.game_over) {
+                snprintf(state.status_msg, sizeof(state.status_msg),
+                         "Disconnected from server.");
+                state.running = 0;
+            }
             break;
         }
 
@@ -115,6 +117,7 @@ void *network_listen_thread(void *arg) {
 
     return NULL;
 }
+
 
 
 
