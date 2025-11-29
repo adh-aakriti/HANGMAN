@@ -93,10 +93,13 @@ int main(int argc, char const *argv[]){
             } else if (ev.type == SDL_KEYDOWN) {
                 SDL_Keycode key = ev.key.keysym.sym;
         
+                // During the game: letters send guesses
                 if (!state.game_over && key >= SDLK_a && key <= SDLK_z) {
                     char letter = (char)('a' + (key - SDLK_a));
                     send_guess(letter);
-                } else if (state.game_over && key == SDLK_ESCAPE) {
+                }
+                // After the game is over (win OR lose): ESC exits
+                else if (state.game_over && key == SDLK_ESCAPE) {
                     state.running = 0;
                 }
             }
@@ -128,6 +131,7 @@ int main(int argc, char const *argv[]){
 
     return 0;
 }
+
 
 
 
