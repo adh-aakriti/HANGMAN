@@ -24,8 +24,13 @@ static int connect_to_server(const char *server_ip) {
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
-    addr.sin_port = htons(PORT);      
-    inet_pton(AF_INET, server_ip, &addr.sin_addr);
+    addr.sin_port = htons(PORT);
+
+    if (inet_pton(AF_INET, server_ip, &addr.sin_addr) <= 0) {
+        perror("inet_pton");
+        close(fd);
+        return -1;
+    }
 
     if (connect(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
         perror("connect");
@@ -117,6 +122,7 @@ int main(int argc, char const *argv[]){
 
     return 0;
 }
+
 
 
 
