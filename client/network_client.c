@@ -67,7 +67,13 @@ void *network_listen_thread(void *arg) {
                 state.word_len = (int)strlen(state.masked_word);
             
             } else if (strncmp(line, "GUESSED", 7) == 0) {
+                state.guessed_letters[0] = '\0';
                 sscanf(line, "GUESSED %26s", state.guessed_letters);
+                char buf[27];
+                if (sscanf(line, "GUESSED %26s", buf) == 1) {
+                    strncpy(state.guessed_letters, buf, 26);
+                    state.guessed_letters[26] = '\0';
+                }
 
             } else if (strncmp(line, "ALREADY_GUESSED", 15) == 0) {
                 char letter;
@@ -102,6 +108,7 @@ void *network_listen_thread(void *arg) {
 
     return NULL;
 }
+
 
 
 
