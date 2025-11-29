@@ -38,6 +38,8 @@ void *network_listen_thread(void *arg) {
 
             if (strncmp(line, "LEVEL", 5) == 0) {
                 sscanf(line, "LEVEL %d", &state.level);
+                snprintf(state.status_msg, sizeof(state.status_msg),
+                     "Level %d", state.level);
 
             } else if (strncmp(line, "WORD_LEN", 8) == 0) {
                 sscanf(line, "WORD_LEN %d", &state.word_len);
@@ -45,6 +47,7 @@ void *network_listen_thread(void *arg) {
             } else if (strncmp(line, "WORD", 4) == 0) {
                 sscanf(line, "WORD %63s", state.masked_word);
                 state.word_len = (int)strlen(state.masked_word);
+                state.mistakes = 0; 
 
             } else if (strncmp(line, "UPDATE", 6) == 0) {
                 sscanf(line, "UPDATE %63s %d",
@@ -99,6 +102,7 @@ void *network_listen_thread(void *arg) {
 
     return NULL;
 }
+
 
 
 
