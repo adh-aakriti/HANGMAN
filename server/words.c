@@ -12,28 +12,28 @@ char w2[MAX_WORDS][64];
 int n4 = 0, n3 = 0, n2 = 0;
 
 // loads words from txt
-void load_words(const char* file, char list[][64], int *cnt) {
+void load_words(const char* file, char list[][64], int *n) {
     FILE *f = fopen(file, "r");
     if (!f) return;
 
-    while (*cnt < MAX_WORDS && fgets(list[*cnt], 64, f)) {
-        trim_newline(list[*cnt]);
-        (*cnt)++;
+    while (*n < MAX_WORDS && fgets(list[*n], 64, f)) {
+        trim_newline(list[*n]);
+        (*n)++;
     }
     fclose(f);
 }
 
 void init_words() {
     srand(time(NULL));
-    int c4 = 0, c3 = 0, c2 = 0;
+    int a = 0, b = 0, c = 0;
 
-    load_words("../assets/words_4.txt", w4, &c4);
-    load_words("../assets/words_3.txt", w3, &c3);
-    load_words("../assets/words_2.txt", w2, &c2);
+    load_words("../assets/words_4.txt", w4, &a);
+    load_words("../assets/words_3.txt", w3, &b);
+    load_words("../assets/words_2.txt", w2, &c);
 
-    n4 = c4;
-    n3 = c3;
-    n2 = c2;
+    n4 = a;
+    n3 = b;
+    n2 = c;
 }
 
 char* get_random_word(int length) {

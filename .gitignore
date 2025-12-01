@@ -1,0 +1,6 @@
+build/
+*.o
+*.a
+hangman_server
+hangman_client
+leaderboard.txt
