@@ -12,8 +12,10 @@ sudo apt update
 sudo apt install -y gcc cmake libsdl2-dev libsdl2-ttf-dev pthread
 git clone <repo>
 cd HANGMAN
-mkdir build && cd build
+mkdir build
+cd build
 cmake ..
 make
-./server_app &
+./server_app
 ./client_app
+
