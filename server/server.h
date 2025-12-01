@@ -8,27 +8,27 @@
 int create_server_socket(int port);
 
 typedef struct {
-    int socket_fd;
-    struct sockaddr_in address;
+    int fd;
+    struct sockaddr_in addr;
     int id;
     int active;
     
     // Game State
     int level;
-    char current_word[64];
-    char masked_word[64];
-    int mistakes;
-    time_t start_time;
-    int time_limit;
-    char guessed_letters[27];
-    int word_len;
-    int finished;
+    char word[64];
+    char mask[64];
+    int errors;
+    time_t start;
+    int limit;
+    char guessed[27];
+    int len;
+    int done;
 } Client;
 
 // Global State
 extern Client *clients[100];
-extern int client_count;
-extern pthread_mutex_t clients_mutex;
+extern int count;
+extern pthread_mutex_t mutex;
 
 // Functions
 void init_words();

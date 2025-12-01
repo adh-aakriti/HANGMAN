@@ -6,21 +6,21 @@
 #include "../common/protocol.h"
 
 typedef struct {
-    int socket_fd;
+    int fd;
     int running;
     int level;
-    char masked_word[64];
-    int mistakes;
-    int timer_val;
-    char status_msg[128];
-    int game_over;
-    char guessed_letters[27]; 
-    int word_len;             
-    char current_word[64];
-    Uint32 start_ticks;
-    int final_time_sec; 
+    char mask[64];
+    int errors;
+    int timer;
+    char msg[128];
+    int over;
+    char guessed[27]; 
+    int len;             
+    char word[64];
+    Uint32 start;
+    int time; 
     int win;
-    pthread_mutex_t state_mutex;
+    pthread_mutex_t mutex;
 } GameState;
 
 extern GameState state;
