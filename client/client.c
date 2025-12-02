@@ -1,4 +1,4 @@
-#include "client.h"
+#include "client.h" 
 #include "../common/utils.h"
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -128,3 +128,4 @@ int main(int argc, char const *argv[]){
     pthread_mutex_destroy(&state.mutex);
     return 0;
 }
+
