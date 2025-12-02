@@ -5,13 +5,11 @@ void timer_start(GameTimer *t, int dur) {
     t->start = time(NULL);
     t->dur = dur;
 }
-
 int timer_is_expired(GameTimer *t) {
     time_t now = time(NULL);
     double x = difftime(now, t->start);
     return x >= t->dur;
 }
-
 int timer_get_remaining(GameTimer *t) {
     time_t now = time(NULL);
     double x = difftime(now, t->start);
