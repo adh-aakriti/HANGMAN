@@ -45,7 +45,7 @@ void check_timeout(Client *c) {
         snprintf(buf, sizeof(buf), "GAME_OVER LOSE\n");
         send_msg(c, buf);
         c->active = 0;
-        update_leaderboard(c->id, "LOST");
+        //update_leaderboard(c->id, "LOST");
     }
 }
 void process_guess(Client *c, char ch) {
@@ -80,7 +80,7 @@ void process_guess(Client *c, char ch) {
         snprintf(buf, sizeof(buf), "GAME_OVER LOSE\n");
         send_msg(c, buf);
         c->active = 0; 
-        update_leaderboard(c->id, "LOST"); 
+        //update_leaderboard(c->id, "LOST"); 
         return;
     }
 
@@ -99,7 +99,7 @@ void process_guess(Client *c, char ch) {
                 }
             }
             pthread_mutex_unlock(&mutex);
-            update_leaderboard(c->id, "WON");
+            //update_leaderboard(c->id, "WON");
             return;
         }
         snprintf(buf, sizeof(buf), "LEVEL_COMPLETE %d\n", c->level - 1);
@@ -193,6 +193,7 @@ int main() {
     }
     return 0;
 }
+
 
 
 
