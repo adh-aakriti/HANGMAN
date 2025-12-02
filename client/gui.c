@@ -1,4 +1,6 @@
-// Helper stub, most GUI logic is in render.c and client.c
+// don't know how to delete this lmao 
+//doesnt do anythign
 //#include "client.h"
+
 
 
