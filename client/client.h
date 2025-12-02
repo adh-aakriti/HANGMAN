@@ -1,4 +1,4 @@
-#ifndef CLIENT_H
+#ifndef CLIENT_H //another check to make sure no repetitiveness
 #define CLIENT_H
 #include <SDL.h>
 #include <SDL_ttf.h>
@@ -25,9 +25,10 @@ typedef struct {
 GameState;
 
 extern GameState state;
-SDL_Window* init_sdl();
-void cleanup_sdl(SDL_Window* win, SDL_Renderer* ren);
-void render_game(SDL_Renderer *renderer, TTF_Font *font);
-void *network_listen_thread(void *arg);
-void send_guess(char letter);
+SDL_Window* init_sdl(); //initializes sdl and returns window pointer
+void cleanup_sdl(SDL_Window* win, SDL_Renderer* ren); //stops sdl and ttf
+void render_game(SDL_Renderer *renderer, TTF_Font *font); //draws current game frame
+void *network_listen_thread(void *arg); //listen to server message 
+void send_guess(char letter); //send single char guess over socket
 #endif
+
