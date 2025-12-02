@@ -8,9 +8,9 @@
 Client *clients[100];
 int count = 0;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-void setup_level(Client *c) {
+void setup_level(Client *c) { // Initializes game data for client depending on their level
     int n = 0;
-    switch (c->level) {
+    switch (c->level) { // Chooses word lenght depending on the level
         case 1: n = 4; break;
         case 2: n = 3; break;
         case 3: n = 2; break;
@@ -19,16 +19,16 @@ void setup_level(Client *c) {
     strcpy(c->word, get_random_word(n));
     printf("[DEBUG] Player %d level %d word: %s\n",
        c->id, c->level, c->word);
-    fflush(stdout);
+    fflush(stdout); // Forces output to be written immediately
 
     for (int i = 0; i < n; i++) {
-        c->word[i] = toupper((unsigned char)c->word[i]);
+        c->word[i] = toupper((unsigned char)c->word[i]); //Converts each character of the word to uppercase
     }
     c->word[n] = '\0';
     c->len = n;
     c->errors    = 0;
-    memset(c->guessed, 0, sizeof(c->guessed)); 
-    memset(c->mask, '_', n);
+    memset(c->guessed, 0, sizeof(c->guessed)); // Clears the guesses array
+    memset(c->mask, '_', n); // Fills mask with "_"
     c->mask[n] = '\0';
 }
 void send_msg(Client *c, char *msg) {
@@ -38,7 +38,7 @@ void check_timeout(Client *c) {
     time_t now = time(NULL);
     double x = difftime(now, c->start);
 
-    if (x >= c->limit) {
+    if (x >= c->limit) { // if the elapsed time exceeds c-->limit:    
         char buf[BUFFER_SIZE];
         snprintf(buf, sizeof(buf), "FINAL_WORD %s\n", c->word);
         send_msg(c, buf);
@@ -72,7 +72,7 @@ void process_guess(Client *c, char ch) {
     if (!hit) {
         c->errors++;
     }
-    if (c->errors >= 7) {
+    if (c->errors >= 7) { // If the client has made 7 errors or more:
         snprintf(buf, sizeof(buf), "UPDATE %s %d\n", c->word, c->errors);
         send_msg(c, buf);
         snprintf(buf, sizeof(buf), "FINAL_WORD %s\n", c->word);
@@ -85,7 +85,7 @@ void process_guess(Client *c, char ch) {
     }
 
 
-    if (strcmp(c->mask, c->word) == 0) {
+    if (strcmp(c->mask, c->word) == 0) { // Checks if the masked word is now equal to the real word
         c->level++;
         if (c->level > 3) {
             char win[BUFFER_SIZE]; 
@@ -101,7 +101,7 @@ void process_guess(Client *c, char ch) {
             pthread_mutex_unlock(&mutex);
             //update_leaderboard(c->id, "WON");
             return;
-        }
+        } // If player has completed a level but not the whole game
         snprintf(buf, sizeof(buf), "LEVEL_COMPLETE %d\n", c->level - 1);
         send_msg(c, buf);
         setup_level(c);
@@ -136,17 +136,17 @@ void *client_handler(void *arg) {
 
     while (c->active) {
         check_timeout(c);
-        fd_set fds;
+        fd_set fds; // Declares an fd_set and clears it with FD_ZERO
         FD_ZERO(&fds);
-        FD_SET(c->fd, &fds);
+        FD_SET(c->fd, &fds); // Adds the client socket c->fd to the set using FD_SE
         struct timeval tv;
         tv.tv_sec  = 0;
-        tv.tv_usec = 100000;
+        tv.tv_usec = 100000; // Sets a timeout of 0.1 seconds for select()
         int x = select(c->fd + 1, &fds, NULL, NULL, &tv);
         if (x < 0) {
             break;
         }
-        if (FD_ISSET(c->fd, &fds)) {
+        if (FD_ISSET(c->fd, &fds)) { // If c->fd is in the set, it means there is data to read
             int n = read(c->fd, buf, BUFFER_SIZE - 1);
 
             if (n <= 0) {
@@ -155,7 +155,7 @@ void *client_handler(void *arg) {
             }
             buf[n] = '\0';
 
-            if (strncmp(buf, "GUESS", 5) == 0) {
+            if (strncmp(buf, "GUESS", 5) == 0) { // Checks if the message begins with "GUESS"
                 char ch = buf[6];
                 process_guess(c, ch);
             }
@@ -166,8 +166,8 @@ void *client_handler(void *arg) {
     return NULL;
 }
 int main() {
-    init_words(); 
-    int fd = create_server_socket(PORT);
+    init_words(); // Calls init_words() to prepare the word list for the game
+    int fd = create_server_socket(PORT); // Creates the listening server socket on PORT.
     printf("Server started on port %d\n", PORT);
 
     while (1) {
@@ -193,6 +193,7 @@ int main() {
     }
     return 0;
 }
+
 
 
 
