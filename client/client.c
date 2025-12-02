@@ -40,7 +40,7 @@ static int connect_to_server(const char *ip) { //static so only this .c file can
     return sock;
 }
 
-int main(int argc, char const *argv[]){
+int main(int argc, char const *argv[]){ //sets ip to stdrd 127 unless client gives 2 arguments 
     const char *ip = "127.0.0.1";
 
     if (argc >= 2) {
@@ -128,5 +128,6 @@ int main(int argc, char const *argv[]){
     pthread_mutex_destroy(&state.mutex);
     return 0;
 }
+
 
 
