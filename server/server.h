@@ -8,7 +8,7 @@ int create_server_socket(int port);
 
 typedef struct {
     int fd;
-    struct sockaddr_in addr;
+    struct sockaddr_in addr; // IP adress and client port
     int id;
     int active;
     int level;
@@ -22,12 +22,13 @@ typedef struct {
     int done;
 } 
 Client;
-extern Client *clients[100];
+extern Client *clients[100]; // Globar array of pointers up to 100. Extern means, declared here but defined elsewhere
 extern int count;
 extern pthread_mutex_t mutex;
 void init_words();
-char* get_random_word(int length);
+char* get_random_word(int length); // Return a random word
 void update_leaderboard(int client_id, const char* result);
 void broadcast(const char* message);
 #endif
+
 
