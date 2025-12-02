@@ -4,9 +4,9 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-int create_server_socket(int port) {
+int create_server_socket(int port) { //start server
     int fd;
-    struct sockaddr_in addr;
+    struct sockaddr_in addr; //prepares socket to accept clients
     int opt = 1;
 
     if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) die("socket failed");
@@ -24,5 +24,6 @@ int create_server_socket(int port) {
         die("listen failed");
     return fd;
 }
+
 
 
