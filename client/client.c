@@ -1,13 +1,11 @@
 #include "client.h"
 #include "../common/utils.h"
-
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
 #include <sys/time.h>
-
 GameState state;
 
 static int connect_to_server(const char *ip) {
@@ -22,11 +20,11 @@ static int connect_to_server(const char *ip) {
     addr.sin_family = AF_INET;
     addr.sin_port = htons(PORT);
 
-    // If no IP or localhost -> use loopback directly, no inet_pton
     if (!ip || strcmp(ip, "127.0.0.1") == 0) {
         addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-    } else {
-        // Only use inet_pton for *real* external IPs
+    } 
+        
+    else {
         if (inet_pton(AF_INET, ip, &addr.sin_addr) != 1) {
             perror("inet_pton");
             close(sock);
@@ -39,7 +37,6 @@ static int connect_to_server(const char *ip) {
         close(sock);
         return -1;
     }
-
     return sock;
 }
 
@@ -49,10 +46,8 @@ int main(int argc, char const *argv[]){
     if (argc >= 2) {
         ip = argv[1];
     }
-
     memset(&state, 0, sizeof(state));
     pthread_mutex_init(&state.mutex, NULL);
-
     state.fd = connect_to_server(ip);
     
     if (state.fd < 0) {
@@ -61,55 +56,57 @@ int main(int argc, char const *argv[]){
     }
 
     state.running = 1;
-    state.start    = SDL_GetTicks();
+    state.start = SDL_GetTicks();
     state.time = 0;
-    state.win            = 0;
-
+    state.win = 0;
     pthread_t net;
+    
     if (pthread_create(&net, NULL, network_listen_thread, NULL) != 0) {
         perror("pthread_create");
         close(state.fd);
         return 1;
     }
-
     SDL_Window *win = init_sdl();
     SDL_Renderer *ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (!ren) die("renderer failed");
-
+    
+    if (!ren) {
+        die("renderer failed");
+    }
     TTF_Font *font = TTF_OpenFont("../assets/FreeSans.ttf", 24);
+    
     if (!font) {
-
         fprintf(stderr, "could not open font: %s\n", TTF_GetError());
     }
-
     SDL_Event ev;
     Uint32 last = SDL_GetTicks();
 
     while (state.running) {
 
         while (SDL_PollEvent(&ev)) {
+            
             if (ev.type == SDL_QUIT) {
-                state.running = 0;
-            } else if (ev.type == SDL_KEYDOWN) {
+                state.running = 0;    
+            } 
+                
+            else if (ev.type == SDL_KEYDOWN) {
                 SDL_Keycode key = ev.key.keysym.sym;
         
-                // During the game: letters send guesses
                 if (!state.over && key >= SDLK_a && key <= SDLK_z) {
                     char c = (char)('a' + (key - SDLK_a));
                     send_guess(c);
                 }
-                // After the game is over (win OR lose): ESC exits
+                    
                 else if (state.over && key == SDLK_ESCAPE) {
                     state.running = 0;
                 }
             }
         }
-
         Uint32 now = SDL_GetTicks();
+        
         if (now - last > 1000) {
             last = now;
-            
             pthread_mutex_lock(&state.mutex);
+            
             if (!state.over && state.timer > 0) {
                 state.timer--;
             }
@@ -122,25 +119,12 @@ int main(int argc, char const *argv[]){
 
     state.running = 0;
     pthread_join(net, NULL);
-
     close(state.fd);
-
-    if (font) TTF_CloseFont(font);
+    
+    if (font){
+        TTF_CloseFont(font);
+    }
     cleanup_sdl(win, ren);
     pthread_mutex_destroy(&state.mutex);
-
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
