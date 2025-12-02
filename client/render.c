@@ -186,3 +186,4 @@ void render_game(SDL_Renderer *ren, TTF_Font *font) {
     render_keyboard(ren, font); 
     SDL_RenderPresent(ren);
 }
+
