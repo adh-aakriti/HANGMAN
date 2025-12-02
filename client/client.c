@@ -8,8 +8,8 @@
 #include <sys/time.h>
 GameState state;
 
-static int connect_to_server(const char *ip) {
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
+static int connect_to_server(const char *ip) { //static so only this .c file can view this fucntion
+    int sock = socket(AF_INET, SOCK_STREAM, 0); // creates TCP socket 
     if (sock < 0) {
         perror("socket");
         return -1;
@@ -20,19 +20,19 @@ static int connect_to_server(const char *ip) {
     addr.sin_family = AF_INET;
     addr.sin_port = htons(PORT);
 
-    if (!ip || strcmp(ip, "127.0.0.1") == 0) {
+    if (!ip || strcmp(ip, "127.0.0.1") == 0) { // checks the ip value
         addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
     } 
         
     else {
-        if (inet_pton(AF_INET, ip, &addr.sin_addr) != 1) {
+        if (inet_pton(AF_INET, ip, &addr.sin_addr) != 1) { // converts ip into binary 
             perror("inet_pton");
             close(sock);
             return -1;
         }
     }
 
-    if (connect(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+    if (connect(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) { //connection attempt
         perror("connect");
         close(sock);
         return -1;
@@ -128,4 +128,5 @@ int main(int argc, char const *argv[]){
     pthread_mutex_destroy(&state.mutex);
     return 0;
 }
+
 
