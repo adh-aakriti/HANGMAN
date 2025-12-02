@@ -1,7 +1,6 @@
-NO
-TO
-ON
-OR
-AT
-AN
-
+no
+to
+on
+or
+at
+an
