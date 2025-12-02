@@ -21,7 +21,8 @@ typedef struct {
     int time; 
     int win;
     pthread_mutex_t mutex;
-} GameState;
+} 
+GameState;
 
 extern GameState state;
 SDL_Window* init_sdl();
@@ -30,7 +31,3 @@ void render_game(SDL_Renderer *renderer, TTF_Font *font);
 void *network_listen_thread(void *arg);
 void send_guess(char letter);
 #endif
-
-
-
-
