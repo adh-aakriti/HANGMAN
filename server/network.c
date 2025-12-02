@@ -9,22 +9,20 @@ int create_server_socket(int port) {
     struct sockaddr_in addr;
     int opt = 1;
 
-    if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
-        die("socket failed");
+    if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) die("socket failed");
 
-    if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
-        die("setsockopt failed");
+    if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) die("setsockopt failed");
 
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = INADDR_ANY;
     addr.sin_port = htons(port);
-
+    
     if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
         die("bind failed");
 
     if (listen(fd, 10) < 0)
         die("listen failed");
-
     return fd;
 }
+
 
