@@ -7,30 +7,30 @@
 #include <stdio.h>
 extern GameState state; 
 
-void send_guess(char c) {
+void send_guess(char c) { //sends guesses in protocol format 
     char buf[64];
     snprintf(buf, sizeof(buf), "GUESS %c\n", c);
     send(state.fd, buf, strlen(buf), 0);
 }
-void *network_listen_thread(void *arg) {
+void *network_listen_thread(void *arg) { //keeps on looping till game ends, input buffer for incoming msg
     (void)arg;
     char buf[1024];
 
 while (state.running) {
-    int n = read(state.fd, buf, sizeof(buf) - 1);
+    int n = read(state.fd, buf, sizeof(buf) - 1); //wait for server to send data, if nthn block thread
         if (n <= 0) {
-            if (!state.over) {
+            if (!state.over) { //exit if failure
                 snprintf(state.msg, sizeof(state.msg),
                          "Disconnected from server.");
                 state.running = 0;
             }
             break;
         }
-        buf[n] = '\0';
-        pthread_mutex_lock(&state.mutex);
-        char *line = strtok(buf, "\n");
+        buf[n] = '\0'; //null for string state
+        pthread_mutex_lock(&state.mutex); //lock mutex
+        char *line = strtok(buf, "\n"); // split messages in lines
     
-        while (line) {
+        while (line) { //runs custom protocol to check msg 
 
             if (strncmp(line, "LEVEL", 5) == 0) {
                 sscanf(line, "LEVEL %d", &state.level);
@@ -117,10 +117,11 @@ while (state.running) {
             }
             line = strtok(NULL, "\n");
         }
-        pthread_mutex_unlock(&state.mutex);
+        pthread_mutex_unlock(&state.mutex); //unlock mutex
     }
     return NULL;
 }
+
 
 
 
